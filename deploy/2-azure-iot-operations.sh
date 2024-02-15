@@ -1,0 +1,66 @@
+#! /bin/bash
+
+set -e
+
+if [ -z "$CLUSTER_NAME" ]; then
+    echo "CLUSTER_NAME is not set"
+    exit 1
+fi
+if [ -z "$RESOURCE_GROUP" ]; then
+    echo "RESOURCE_GROUP is not set"
+    exit 1
+fi
+if [ -z "$LOCATION" ]; then
+    echo "LOCATION is not set"
+    exit 1
+fi
+if [ -z "$AKV_NAME" ]; then
+    echo "AKV_NAME is not set"
+    exit 1
+fi
+
+# Variables
+scriptPath=$(dirname $0)
+random=$RANDOM
+deploymentName="aio-deployment-$random"
+
+# Create Key Vault
+echo "Create Key Vault"
+az keyvault create -n $AKV_NAME -g $RESOURCE_GROUP --enable-rbac-authorization false
+keyVaultResourceId=$(az keyvault show -n $AKV_NAME -g $RESOURCE_GROUP -o tsv --query id)
+
+# Initialize Azure IoT Operations Preview Pre-requisites
+# This will install Azure Arc Extension CSI Driver, configure TLS and some Secrets and ConfigMaps
+echo "Initializing Azure IoT Operations pre-requisites with the Azure IoT CLI extension"
+az iot ops init --cluster $CLUSTER_NAME -g $RESOURCE_GROUP  \
+  --kv-id $keyVaultResourceId \
+  --no-deploy
+
+echo "Installing Azure IoT Operations Preview components using ARM template for more control"
+az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --name aio-deployment-$deploymentName \
+    --template-file "$scriptPath/templates/azureiotops-edited.json" \
+    --parameters clusterName=$CLUSTER_NAME \
+    --parameters location=$LOCATION \
+    --parameters clusterLocation=$LOCATION \
+    --parameters deployResourceSyncRules=false \
+    --parameters simulatePLC=true \
+    --no-prompt
+
+# Add a Developer endpoint non TLS for MQ - local testing
+echo "Local dev - adding a non-TLS BrokerListener for port 1883"
+kubectl apply -f $scriptPath/yaml/mq-listener-non-tls.yaml 
+
+# Check Broker is running - when using CLI to deploy AIO, the broker is named 'broker'
+status=$(kubectl get broker broker -n $DEFAULT_NAMESPACE -o json | jq '.status.status')
+while [ "$status" != "\"Running\"" ]
+do
+    echo "Waiting for MQ broker to be running"
+    sleep 5
+    status=$(kubectl get broker broker -n $DEFAULT_NAMESPACE -o json | jq '.status.status')
+done
+
+echo "MQ Broker is now running"
+
+echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
