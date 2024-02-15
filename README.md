@@ -37,9 +37,9 @@ By using the Dev Container, a K3D cluster and any documented client tools will b
 * Log into Azure and set your default subscription.
 
   ```bash
-  az login --tenant-id <your tenant ID>
+  az login --tenant <your tenant ID or domain>
 
-  az account set -s <your subscription>`
+  az account set -s <your subscription ID or name>`
   ```
 
 * Prepare the following inputs to create environment variables in the next step:
