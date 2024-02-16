@@ -29,11 +29,10 @@ az provider register -n "Microsoft.DeviceRegistry"
 
 az group create --name $RESOURCE_GROUP --location $LOCATION
 
-kubectl get nodes
-
 # try connecting to Arc, if it fails, continue with debug code
 set +e
 
+echo "Connecting the local K3S cluster to Azure Arc"
 az connectedk8s connect --name $CLUSTER_NAME \
     --resource-group $RESOURCE_GROUP \
     --location $LOCATION
