@@ -1,42 +1,90 @@
-# Project Name
+# Sample with Azure IoT Operations Preview and Local Observability with OpenTelemetry and GitOps
 
-(short, 1-3 sentenced, description of the project)
+This sample is currently work in progress.
 
-## Features
+In this sample, a Visual Studio Code dev container is used as the developer sandbox to leverage a local K3D cluster, initialize Azure resources and install a baseline set of Azure IoT Operations' components.
+
+> [!WARNING]
+Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability.
+
+<!-- ## Features (TODO to come later)
 
 This project framework provides the following features:
 
 * Feature 1
 * Feature 2
-* ...
+* ... -->
 
 ## Getting Started
 
 ### Prerequisites
 
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
+* Visual Studio Code
+* Dev Containers support in Visual Studio Code
+* Azure subscription
+* Azure account with Owner permissions on the Subscription
+* Docker runtime
 
 ### Installation
 
-(ideally very short)
+We recommend you fork this project in GitHub and clone the fork in order to setup GitOps independently from the main repo. This will enable you to apply changes and experiment more easily.
 
-- npm install [package name]
-- mvn install
-- ...
+By using the Dev Container, a K3D cluster and any documented client tools will be automatically installed and ready to use for testing out the sample.
+
+* Fork this repository in GitHub.
+* Clone your fork locally.
+* Open the project with Visual Studio Code.
+* Launch the Dev Container with Command Palette > `Dev Containers: Reopen in Container`. First time building the container may take a while.
+* Open a `bash` terminal and leave the current directory to the default root folder `/workspaces/azure-edge-extensions-aio-observability-gitops`.
+* Log into Azure and set your default subscription.
+
+  ```bash
+  az login --tenant <your tenant ID or domain>
+
+  az account set -s <your subscription ID or name>`
+  ```
+
+* Run the following in the `bash` terminal to create a file in the `./temp` directory for storing and loading environment variables. This folder is excluded from Git.
+
+```bash
+if [ ! -d "./temp" ]; then
+    mkdir ./temp
+fi
+>./temp/envvars.sh cat <<EOF
+# change the below set to match your environment based on Readme
+export RESOURCE_GROUP=YOUR_CHOICE # For example rg-myabbrev-dev1
+export CLUSTER_NAME=YOUR_CHOICE # For example arck-myabbrev-dev1
+export AKV_NAME=YOUR_CHOICE # For example arck-myabbrev-dev1
+export LOCATION=northeurope # replace by your choice based on available regions, see Readme
+export ARC_CUSTOMLOCATION_OID="" # see Readme
+export DEFAULT_NAMESPACE=azure-iot-operations # do not change
+EOF
+
+code ./temp/envvars.sh
+
+```
+
+* The newly created file `./temp/envvars.sh` should now be open in the Code editor.
+* Update the variables in the file according to these details:
+  * For the resource names, use your preferred Azure resource names in the variable contents. An example using the recommended resource abbreviations provided in the comments
+  * `ARC_CUSTOMLOCATION_OID`: retrieve the unique Custom location Object ID for your tenant by running `az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv`
+  * `LOCATION`: make sure you choose something from the supported list of regions as documented in [Deploy Azure IoT Operations, see Location table](https://learn.microsoft.com/en-us/azure/iot-operations/get-started/quickstart-deploy?tabs=codespaces#connect-a-kubernetes-cluster-to-azure-arc)
+
+* Load the environment variables in your terminal by running:
+
+  ```bash
+  source ./temp/envvars.sh
+  ```
 
 ### Quickstart
-(Add steps to get up and running quickly)
 
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
+Enable the local K3D cluster to Azure Arc and install Azure IoT Operations with the default components and configuration.
 
+1. In a `bash` terminal, run the script script `./deploy/1-arc-k8s-connect.sh` to connect the K3D cluster to Azure Arc. This will take a few minutes.
+1. Run the script `./deploy/2-azure-iot-operations.sh`. Grab a coffee, this can take 15 minutes.
+1. Validate the installation finished correctly by running `mqttui` in the terminal. You should see messages being published in the topic `azure-iot-operations`.
 
-## Demo
+<!-- ## Demo (TODO)
 
 A demo app is included to show how to use the project.
 
@@ -46,12 +94,13 @@ To run the demo, follow these steps:
 
 1.
 2.
-3.
+3. -->
 
-## Resources
+<!-- 
+## Resources (TODO)
 
 (Any additional resources or related projects)
 
 - Link to supporting information
 - Link to similar sample
-- ...
+- ... -->
