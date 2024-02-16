@@ -83,6 +83,7 @@ Enable the local K3D cluster to Azure Arc and install Azure IoT Operations with 
 1. In a `bash` terminal, run the script script `./deploy/1-arc-k8s-connect.sh` to connect the K3D cluster to Azure Arc. This will take a few minutes.
 1. Run the script `./deploy/2-azure-iot-operations.sh`. Grab a coffee, this can take 15 minutes.
 1. Validate the installation finished correctly by running `mqttui` in the terminal. You should see messages being published in the topic `azure-iot-operations`.
+1. Run the script `./deploy/3-flux-install.sh`. TODO
 
 <!-- ## Demo (TODO)
 
