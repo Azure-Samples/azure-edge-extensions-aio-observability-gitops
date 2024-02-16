@@ -396,3 +396,15 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Temp working files
+.env
+/temp/*
+
+# AIO generated cert stuff
+*.crt
+*.key
+
+# Azure resource manager and parameter files
+*.parameters.json
+!example*.parameters.json

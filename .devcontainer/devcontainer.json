@@ -1,0 +1,59 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+	"name": "AIO K3D",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/azure-cli:1": {
+			"extensions": "connectedk8s,k8s-extension,azure-iot-ops"
+		},
+		"ghcr.io/rio/features/k3d:1": {},
+		"ghcr.io/rio/features/k9s:1.1.5": {},
+		"ghcr.io/devcontainers/features/powershell:1.2": {}
+		// add here any other features you want to install
+	},
+
+	// requirements for AIO
+	"hostRequirements": {
+		"cpus": 4,
+		"memory": "8gb",
+		"storage": "32gb"
+	 },
+	 "containerEnv": {
+	   "K3D_FIX_MOUNTS": "1"
+	 },
+	 
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		1883,
+		8883
+	],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "bash ./.devcontainer/postCreateCommand.sh",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-bicep", 
+				"davidanson.vscode-markdownlint", 
+				"streetsidesoftware.code-spell-checker",
+				"ms-dotnettools.csdevkit",
+				"ms-azuretools.vscode-dapr",
+				"ms-kubernetes-tools.vscode-kubernetes-tools",
+				"EditorConfig.EditorConfig",
+				"ms-vscode.powershell",
+                "ms-azuretools.vscode-bicep"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
