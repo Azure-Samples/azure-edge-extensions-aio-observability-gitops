@@ -35,7 +35,7 @@ spec:
             url: http://prometheus-server.edge-observability.svc.cluster.local
             isDefault: true
             jsonData:
-              timeInterval: interval_to_be_overwritten
+              timeInterval: 5m
           - name: Tempo
             type: tempo
             url: http://grafana-tempo.edge-observability.svc.cluster.local:3100
