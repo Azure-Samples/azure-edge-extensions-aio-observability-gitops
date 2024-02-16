@@ -1,0 +1,16 @@
+resources:
+  - ./edge-observability/1.0
+  - ./collection-interval-config-map.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: collection-interval
+      namespace: flux-system
+      fieldPath: data.collection-interval
+    targets:
+      - select:
+          kind: HelmRelease
+          name: grafana
+        fieldpaths:
+          - spec.values.datasources.datasources\.yaml.datasources.[name=Prometheus].jsonData.timeInterval

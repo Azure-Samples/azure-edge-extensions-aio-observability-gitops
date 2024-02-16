@@ -1,0 +1,14 @@
+resources:
+  - ./namespace.yaml
+  - ./prometheus-helm.yaml
+  - ./grafana-helm.yaml
+
+configMapGenerator:
+  - name: custom-grafana-dashboards
+    namespace: edge-observability
+    files:
+      - grafana-dashboards/opc-ua-broker.json
+      - grafana-dashboards/mq-broker.json
+      - grafana-dashboards/resource-usage.json
+generatorOptions:
+  disableNameSuffixHash: true
