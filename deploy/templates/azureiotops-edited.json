@@ -848,6 +848,21 @@
                   "resource_to_telemetry_conversion": {
                     "enabled": true
                   }
+                },
+                "prometheusremotewrite": {
+                  "endpoint": "http://prometheus-server.edge-observability/api/v1/write",
+                  "resource_to_telemetry_conversion": {
+                    "enabled": true
+                  }
+                },
+                "otlp/tempo": {
+                  "endpoint": "grafana-tempo.edge-observability:4317",
+                  "tls": {
+                    "insecure": true
+                  }
+                },
+                "loki": {
+                  "endpoint": "http://grafana-loki.edge-observability:3100/loki/api/v1/push"
                 }
               },
               "extensions": {
@@ -882,16 +897,32 @@
                   "health_check"
                 ],
                 "pipelines": {
-                  "logs": null,
-                  "metrics": {
+                  "logs": {
                     "exporters": [
-                      "prometheus"
+                      "loki",
+                      "logging"
                     ],
                     "receivers": [
                       "otlp"
                     ]
                   },
-                  "traces": null
+                  "metrics": {
+                    "exporters": [
+                      "prometheus",
+                      "prometheusremotewrite",
+                      "logging"
+                    ],
+                    "receivers": [
+                      "otlp",
+                      "prometheus"
+                    ]
+                  },
+                  "traces": {
+                    "exporters": [
+                      "otlp/tempo",
+                      "logging"
+                    ]
+                  }
                 },
                 "telemetry": null
               }
@@ -953,9 +984,9 @@
               "enabled": true,
               "endpoints": {
                 "default": {
-                  "emitLogs": false,
+                  "emitLogs": true,
                   "emitMetrics": true,
-                  "emitTraces": false,
+                  "emitTraces": true,
                   "protocol": "grpc",
                   "uri": "[variables('OBSERVABILITY').otelCollectorAddress]"
                 },
