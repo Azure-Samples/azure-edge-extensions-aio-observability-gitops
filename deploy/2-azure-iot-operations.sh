@@ -63,4 +63,14 @@ done
 
 echo "MQ Broker is now running"
 
+# OPC AssetEndpointProfile and Assets with a Bicep template
+echo "Deploying OPC AssetEndpointProfile and Asset using Bicep"
+az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --name assets-deployment-$deploymentName \
+    --template-file "$scriptPath/templates/assets-endpoint.bicep" \
+    --parameters clusterName=$CLUSTER_NAME \
+    --parameters location=$LOCATION \
+    --no-prompt
+
 echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
