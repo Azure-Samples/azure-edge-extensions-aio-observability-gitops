@@ -83,7 +83,18 @@ Enable the local K3D cluster to Azure Arc and install Azure IoT Operations with 
 1. In a `bash` terminal, run the script script `./deploy/1-arc-k8s-connect.sh` to connect the K3D cluster to Azure Arc. This will take a few minutes.
 1. Run the script `./deploy/2-azure-iot-operations.sh`. Grab a coffee, this can take 15 minutes.
 1. Validate the installation finished correctly by running `mqttui` in the terminal. You should see messages being published in the topic `azure-iot-operations`.
-1. Run the script `./deploy/3-flux-install.sh`. TODO
+1. Run the script `./deploy/3-flux-install.sh` to create a [Flux](https://fluxcd.io/flux/) configuration.
+
+### View observability data
+
+Through Flux a set of components for local edge observability was deployed to the cluster. It includes Grafana for interactive visualizations and analytics, Tempo for tracing, Loki for logging, and Prometheus for metrics.
+
+To view the observability data, follow these steps:
+
+1. Initiate port forwarding with the following command: `kubectl port-forward svc/grafana 3000:80 -n edge-observability`
+1. Retrieve the username for Grafana: `kubectl get secret grafana -n edge-observability -o jsonpath="{.data.admin-user}" | base64 --decode`
+1. Retrieve the password for Grafana: `kubectl get secret grafana -n edge-observability -o jsonpath="{.data.admin-password}" | base64 --decode`
+1. Open a web browser and navigate to `127.0.0.1:3000`. Enter the username and password retrieved from the previous steps to log in to Grafana and view the observability data. Check pre-built [Dashboards](https://grafana.com/docs/grafana/latest/dashboards/use-dashboards/) and use [Explore](https://grafana.com/docs/grafana/latest/explore/) functionality to view traces, logs and metrics.
 
 <!-- ## Demo (TODO)
 
