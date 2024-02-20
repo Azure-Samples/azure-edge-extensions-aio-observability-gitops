@@ -9,38 +9,13 @@ var VERSIONS = {
 }
 var observability_helmChart = {
   name: 'aio-observability'
-  type: 'helm.v3'
   properties: {
     chart: {
       repo: 'mcr.microsoft.com/azureiotoperations/helm/aio-opentelemetry-collector'
       version: VERSIONS.observability
     }
     values: {
-      mode: 'deployment'
-      fullnameOverride: 'aio-otel-collector'
       config: {
-        processors: {
-          memory_limiter: {
-            limit_percentage: 80
-            spike_limit_percentage: 10
-            check_interval: '60s'
-          }
-        }
-        receivers: {
-          jaeger: null
-          prometheus: null
-          zipkin: null
-          otlp: {
-            protocols: {
-              grpc: {
-                endpoint: ':4317'
-              }
-              http: {
-                endpoint: ':4318'
-              }
-            }
-          }
-        }
         exporters: {
           prometheus: {
             endpoint: ':8889'
@@ -64,11 +39,45 @@ var observability_helmChart = {
             endpoint: 'http://grafana-loki.edge-observability:3100/loki/api/v1/push'
           }
         }
+        extensions: {
+          memory_ballast: {
+            size_mib: 0
+          }
+        }
+        processors: {
+          memory_limiter: {
+            check_interval: '60s'
+            limit_percentage: 80
+            spike_limit_percentage: 10
+          }
+        }
+        receivers: {
+          jaeger: null
+          otlp: {
+            protocols: {
+              grpc: {
+                endpoint: ':4317'
+              }
+              http: {
+                endpoint: ':4318'
+              }
+            }
+          }
+          prometheus: null
+          zipkin: null
+        }
+
         service: {
           extensions: [
             'health_check'
           ]
           pipelines: {
+            logs: {
+              exporters: [
+                'loki'
+                'logging'
+              ]
+            }
             metrics: {
               receivers: [
                 'otlp'
@@ -77,12 +86,6 @@ var observability_helmChart = {
               exporters: [
                 'prometheus'
                 'prometheusremotewrite'
-                'logging'
-              ]
-            }
-            logs: {
-              exporters: [
-                'loki'
                 'logging'
               ]
             }
@@ -95,25 +98,10 @@ var observability_helmChart = {
           }
           telemetry: null
         }
-        extensions: {
-          memory_ballast: {
-            size_mib: 0
-          }
-        }
       }
-      resources: {
-        limits: {
-          cpu: '100m'
-          memory: '512Mi'
-        }
-      }
+      fullnameOverride: 'aio-otel-collector'
+      mode: 'deployment'
       ports: {
-        metrics: {
-          enabled: true
-          containerPort: 8889
-          servicePort: 8889
-          protocol: 'TCP'
-        }
         'jaeger-compact': {
           enabled: false
         }
@@ -123,12 +111,25 @@ var observability_helmChart = {
         'jaeger-thrift': {
           enabled: false
         }
+        metrics: {
+          enabled: true
+          containerPort: 8889
+          servicePort: 8889
+          protocol: 'TCP'
+        }
         zipkin: {
           enabled: false
         }
       }
+      resources: {
+        limits: {
+          cpu: '100m'
+          memory: '512Mi'
+        }
+      }
     }
   }
+  type: 'helm.v3'
 }
 
 resource orchestrator_syncRule 'Microsoft.ExtendedLocation/customLocations/resourceSyncRules@2021-08-31-preview' existing = {
