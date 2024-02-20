@@ -1,7 +1,6 @@
 param clusterName string
 param customLocationName string = '${clusterName}-cl'
 param location string = resourceGroup().location
-param targetName string = '${toLower(clusterName)}-target'
 
 var AIO_CLUSTER_RELEASE_NAMESPACE = 'azure-iot-operations'
 var VERSIONS = {
@@ -137,6 +136,8 @@ resource orchestrator_syncRule 'Microsoft.ExtendedLocation/customLocations/resou
 }
 
 resource target 'Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview' = {
+  name: 'aio-otel-collector-override'
+  location: location
   extendedLocation: {
     name: resourceId(
       'Microsoft.ExtendedLocation/customLocations',
@@ -144,8 +145,6 @@ resource target 'Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview'
     )
     type: 'CustomLocation'
   }
-  location: location
-  name: targetName
   properties: {
     components: [observability_helmChart]
     scope: AIO_CLUSTER_RELEASE_NAMESPACE
@@ -175,5 +174,3 @@ resource target 'Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview'
     orchestrator_syncRule
   ]
 }
-
-output targetName string = targetName
