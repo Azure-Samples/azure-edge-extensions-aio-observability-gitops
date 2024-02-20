@@ -45,11 +45,9 @@
 				"davidanson.vscode-markdownlint", 
 				"streetsidesoftware.code-spell-checker",
 				"ms-dotnettools.csdevkit",
-				"ms-azuretools.vscode-dapr",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"EditorConfig.EditorConfig",
-				"ms-vscode.powershell",
-                "ms-azuretools.vscode-bicep"
+				"ms-vscode.powershell"
 			]
 		}
 	}

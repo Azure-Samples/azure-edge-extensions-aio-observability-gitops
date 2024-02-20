@@ -22,7 +22,7 @@ fi
 # Variables
 scriptPath=$(dirname $0)
 random=$RANDOM
-deploymentName="aio-deployment-$random"
+deploymentName="deployment-$random"
 
 # Create Key Vault
 echo "Create Key Vault"
@@ -39,7 +39,7 @@ az iot ops init --cluster $CLUSTER_NAME -g $RESOURCE_GROUP  \
 echo "Installing Azure IoT Operations Preview components using ARM template for more control"
 az deployment group create \
     --resource-group $RESOURCE_GROUP \
-    --name aio-deployment-$deploymentName \
+    --name aio-$deploymentName \
     --template-file "$scriptPath/templates/azureiotops-edited.json" \
     --parameters clusterName=$CLUSTER_NAME \
     --parameters location=$LOCATION \
@@ -62,5 +62,15 @@ do
 done
 
 echo "MQ Broker is now running"
+
+# OPC AssetEndpointProfile and Assets with a Bicep template
+echo "Deploying OPC AssetEndpointProfile and Asset using Bicep"
+az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --name assets-$deploymentName \
+    --template-file "$scriptPath/templates/assets-endpoint.bicep" \
+    --parameters clusterName=$CLUSTER_NAME \
+    --parameters location=$LOCATION \
+    --no-prompt
 
 echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
