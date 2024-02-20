@@ -36,6 +36,13 @@ az iot ops init --cluster $CLUSTER_NAME -g $RESOURCE_GROUP  \
   --kv-id $keyVaultResourceId \
   --no-deploy
 
+# Updating the AKS CSI Driver post-install - this is a workaround to disable a resource intense monitoring Pod
+echo "Updating the AKS CSI Driver post-install"
+az k8s-extension update --cluster-name $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
+    --cluster-type connectedClusters \
+    --name akvsecretsprovider \
+    --configuration-settings arc.enableMonitoring=false --yes
+
 echo "Installing Azure IoT Operations Preview components using ARM template for more control"
 az deployment group create \
     --resource-group $RESOURCE_GROUP \
