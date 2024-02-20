@@ -84,6 +84,7 @@ Enable the local K3D cluster to Azure Arc and install Azure IoT Operations with 
 1. Run the script `./deploy/2-azure-iot-operations.sh`. Grab a coffee, this can take 15 minutes.
 1. Validate the installation finished correctly by running `mqttui` in the terminal. You should see messages being published in the topic `azure-iot-operations`.
 1. Run the script `./deploy/3-flux-install.sh` to create a [Flux](https://fluxcd.io/flux/) configuration.
+1. Run the script `./deploy/4-otel-collector-update.sh` to update aio-otel-collector to export observability data to local edge observability components.
 
 ### View observability data
 
