@@ -48,6 +48,21 @@ var observability_helmChart = {
               enabled: true
             }
           }
+          prometheusremotewrite: {
+            endpoint: 'http://prometheus-server.edge-observability/api/v1/write'
+            resource_to_telemetry_conversion: {
+              enabled: true
+            }
+          }
+          'otlp/tempo': {
+            endpoint: 'grafana-tempo.edge-observability:4317'
+            tls: {
+              insecure: true
+            }
+          }
+          loki: {
+            endpoint: 'http://grafana-loki.edge-observability:3100/loki/api/v1/push'
+          }
         }
         service: {
           extensions: [
@@ -57,13 +72,26 @@ var observability_helmChart = {
             metrics: {
               receivers: [
                 'otlp'
+                'prometheus'
               ]
               exporters: [
                 'prometheus'
+                'prometheusremotewrite'
+                'logging'
               ]
             }
-            logs: null
-            traces: null
+            logs: {
+              exporters: [
+                'loki'
+                'logging'
+              ]
+            }
+            traces: {
+              exporters: [
+                'otlp/tempo'
+                'logging'
+              ]
+            }
           }
           telemetry: null
         }
