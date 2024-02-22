@@ -24,3 +24,5 @@ az deployment group create \
     --parameters clusterName=$CLUSTER_NAME \
     --parameters location=$LOCATION \
     --no-prompt
+
+echo "Successfully updated aio-otel-collector configuration in cluster $CLUSTER_NAME"

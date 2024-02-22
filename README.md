@@ -58,6 +58,8 @@ export AKV_NAME=YOUR_CHOICE # For example arck-myabbrev-dev1
 export LOCATION=northeurope # replace by your choice based on available regions, see Readme
 export ARC_CUSTOMLOCATION_OID="" # see Readme
 export DEFAULT_NAMESPACE=azure-iot-operations # do not change
+export GITOPS_SOURCE_REPO="https://github.com/Azure-Samples/azure-edge-extensions-aio-observability-gitops" # change to your repo fork if you are testing your own version
+export GITOPS_BRANCH="main" # change if desired
 EOF
 
 code ./temp/envvars.sh
