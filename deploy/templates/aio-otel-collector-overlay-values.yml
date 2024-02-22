@@ -1,0 +1,85 @@
+config:
+  receivers:
+    k8s_cluster:
+      collection_interval: 1m # default is 10s
+    kubeletstats:
+      collection_interval: 1m # default is 10s
+    prometheus:
+      config:
+        global:
+          scrape_interval: 1m
+        scrape_configs:
+          - job_name: opentelemetry-collector
+            static_configs:
+            - targets:
+              - ${env:MY_POD_IP}:8888
+          - job_name: "mq-broker"
+            static_configs:
+              - targets:
+                  - aio-mq-diagnostics-service.azure-iot-operations.svc.cluster.local:9600
+  exporters:
+    debug:
+      verbosity: basic
+    prometheusremotewrite:
+      endpoint: 'http://prometheus-server.edge-observability/api/v1/write'
+      resource_to_telemetry_conversion:
+        enabled: true
+    otlp/tempo:
+      endpoint: 'grafana-tempo.edge-observability:4317'
+      tls:
+        insecure: true
+    loki:
+      endpoint: 'http://grafana-loki.edge-observability:3100/loki/api/v1/push'
+  processors:
+    resource:
+      attributes:
+        - key: deployment.environment
+          value: DEV
+          action: insert
+  service:
+    pipelines:
+      logs:
+        processors:
+          - memory_limiter
+          - resource
+          - k8sattributes
+          - batch
+        exporters:
+          - loki
+          - debug
+      metrics:
+        receivers:
+          - otlp
+          - prometheus
+          - kubeletstats
+          - k8s_cluster
+        processors:
+          - memory_limiter
+          - resource
+          - k8sattributes
+          - batch
+        exporters:
+          - prometheus
+          - prometheusremotewrite
+          - debug
+      traces:
+        processors:
+          - memory_limiter
+          - resource
+          - k8sattributes
+          - batch
+        exporters:
+          - otlp/tempo
+          - debug
+presets:
+  kubernetesAttributes:
+    enabled: true
+  # Configures the collector to collect node, pod, and container metrics from the API server on a kubelet.
+  kubeletMetrics:
+    enabled: true
+  # Configures the Kubernetes Cluster Receiver to collect cluster-level metrics.
+  clusterMetrics:
+    enabled: true
+image:
+  repository: otel/opentelemetry-collector-contrib
+  tag: "0.90.0"

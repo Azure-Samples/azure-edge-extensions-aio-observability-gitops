@@ -1,0 +1,54 @@
+config:
+  exporters:
+    prometheus:
+      endpoint: ':8889'
+      resource_to_telemetry_conversion:
+        enabled: true
+  extensions:
+    memory_ballast:
+      size_mib: 0
+  processors:
+    memory_limiter:
+      check_interval: '60s'
+      limit_percentage: 80
+      spike_limit_percentage: 10
+  receivers:
+    jaeger: null
+    otlp:
+      protocols:
+        grpc:
+          endpoint: ':4317'
+        http:
+          endpoint: ':4318'
+    prometheus: null
+    zipkin: null
+  service:
+    extensions:
+      - 'health_check'
+    pipelines:
+      logs: null
+      metrics:
+        exporters:
+          - 'prometheus'
+      traces: null
+    telemetry: null
+fullnameOverride: 'aio-otel-collector'
+mode: 'deployment'
+ports:
+  jaeger-compact:
+    enabled: false
+  jaeger-grpc:
+    enabled: false
+  jaeger-thrift:
+    enabled: false
+  metrics:
+    enabled: true
+    containerPort: 8889
+    servicePort: 8889
+    protocol: 'TCP'
+  zipkin:
+    enabled: false
+resources:
+  limits:
+    cpu: '100m'
+    memory: '512Mi'
