@@ -82,4 +82,4 @@ presets:
     enabled: true
 image:
   repository: otel/opentelemetry-collector-contrib
-  tag: "0.90.0"
+  tag: "0.95.0"
