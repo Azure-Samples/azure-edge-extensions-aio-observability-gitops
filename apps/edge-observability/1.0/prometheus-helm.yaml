@@ -1,0 +1,65 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: flux-system
+spec:
+  interval: 6h
+  url: https://prometheus-community.github.io/helm-charts
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: prometheus
+  namespace: flux-system
+spec:
+  interval: 6h
+  releaseName: prometheus
+  targetNamespace: edge-observability
+  install:
+    createNamespace: true
+  chart:
+    spec:
+      chart: prometheus
+      version: 25.4.0
+      interval: 6h
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+  values:
+    kube-state-metrics:
+      enabled: false
+    alertmanager:
+      enabled: false
+    prometheus-node-exporter:
+      enabled: false
+    prometheus-pushgateway:
+      enabled: false
+    server:
+      persistentVolume:
+        size: 256Mi
+      extraFlags:
+        - web.enable-remote-write-receiver
+        - web.enable-lifecycle
+      retention: 3d
+      resources:
+        limits:
+          cpu: 150m
+          memory: 520Mi
+        requests:
+          cpu: 50m
+          memory: 320Mi
+    configmapReload:
+      prometheus:
+        resources:
+          limits:
+            cpu: 50m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+    serverFiles:
+      prometheus.yml:
+        # This disable default scraping jobs
+        scrape_configs: []

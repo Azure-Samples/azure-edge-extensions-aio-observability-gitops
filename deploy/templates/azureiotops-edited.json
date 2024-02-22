@@ -953,9 +953,10 @@
               "enabled": true,
               "endpoints": {
                 "default": {
-                  "emitLogs": false,
+                  "emitLogs": true,
                   "emitMetrics": true,
-                  "emitTraces": false,
+                  "emitTraces": true,          
+                  "assetTraceSamplingProbability": 0.001,
                   "protocol": "grpc",
                   "uri": "[variables('OBSERVABILITY').otelCollectorAddress]"
                 },
