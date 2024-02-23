@@ -4,6 +4,8 @@ This sample is currently work in progress.
 
 In this sample, a Visual Studio Code dev container is used as the developer sandbox to leverage a local K3D cluster, initialize Azure resources and install a baseline set of Azure IoT Operations' components.
 
+The objective of this repository is to illustrate how to setup observability to be able to locally vizualize health of the cluster and AIO components.
+
 > [!WARNING]
 Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability.
 
