@@ -555,7 +555,8 @@
             "tag": "[variables('VERSIONS').mq]"
           },
           "logFormat": "text",
-          "logLevel": "info"
+          "logLevel": "info",
+          "openTelemetryTracesCollectorAddr": "[variables('OBSERVABILITY').otelCollectorAddress]"
         },
         "type": "Microsoft.IoTOperationsMQ/mq/diagnosticService"
       },
