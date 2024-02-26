@@ -10,7 +10,7 @@
 
 ## Context
 
-Current Azure IoT Operations preview template deploys the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) which is responsible for collecting metrics, traces, and logs from various Azure IoT Edge components.
+Current Azure IoT Operations preview template deploys the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) which is responsible for collecting metrics, traces, and logs from various components.
 
 In this repository we demonstrate:
 
@@ -28,7 +28,9 @@ The local edge observability stack is composed of the following components:
 
 These components are deployed to the cluster using a GitOps approach through Flux. The `app` folder contains [edge-observability](./apps/edge-observability/) directory where all components are configured. This is achieved by specifying a Helm repository and then configuring a Helm release for each component with the minimal required setup.
 
-The Prometheus Helm chart deploys the Prometheus server, the Grafana Loki Helm chart deploys Loki, and the Grafana Tempo Helm chart deploys Tempo. The Grafana Helm chart configures data sources to visualize data from Prometheus, Loki, and Tempo. It also deploys a set of dashboards. These include custom dashboards found in the [grafana-dashboards](./apps/edge-observability/1.0/grafana-dashboards/) folder and imported dashboards from grafana.com, such as the [OpenTelemetry Collector](https://grafana.com/dashboards/15983) and [Otel - kubeletstats](https://grafana.com/dashboards/18681) dashboards.
+The Prometheus Helm chart deploys the Prometheus server, the Grafana Loki Helm chart deploys Loki, and the Grafana Tempo Helm chart deploys Tempo. The Grafana Helm chart configures data sources to visualize data from Prometheus, Loki, and Tempo. It also deploys a set of dashboards, which include:
+* custom dashboards located in the [grafana-dashboards](./apps/edge-observability/1.0/grafana-dashboards/) folder. These were created based on the provided [sample dashboards](https://github.com/Azure/azure-iot-operations/tree/main/samples/grafana-dashboards),
+* dashboards imported from grafana.com, such as the [OpenTelemetry Collector](https://grafana.com/dashboards/15983) and [Otel - kubeletstats](https://grafana.com/dashboards/18681) dashboards.
 
 All pods are deployed to the `edge-observability` namespace, so you can view them by running:
 
