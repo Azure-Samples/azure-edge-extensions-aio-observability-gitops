@@ -43,7 +43,10 @@ az k8s-extension update --cluster-name $CLUSTER_NAME --resource-group $RESOURCE_
     --name akvsecretsprovider \
     --configuration-settings arc.enableMonitoring=false --yes
 
-echo "Installing Azure IoT Operations Preview components using ARM template for more control"
+echo "Installing Azure IoT Operations Preview components using ARM template to customize some settings"
+echo "Settings include:"
+echo "- MQ adding the property 'openTelemetryTracesCollectorAddr'"
+echo "- OPC UA Broker extension setting 'opcPlcSimulation.autoAcceptUntrustedCertificates' property to true for testing"
 az deployment group create \
     --resource-group $RESOURCE_GROUP \
     --name aio-$deploymentName \
@@ -51,7 +54,7 @@ az deployment group create \
     --parameters clusterName=$CLUSTER_NAME \
     --parameters location=$LOCATION \
     --parameters clusterLocation=$LOCATION \
-    --parameters deployResourceSyncRules=false \
+    --parameters deployResourceSyncRules=true \
     --parameters simulatePLC=true \
     --no-prompt
 

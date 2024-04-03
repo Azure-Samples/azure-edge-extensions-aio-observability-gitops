@@ -1,985 +1,943 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "metadata": {
-      "_generator": {
-        "name": "bicep",
-        "templateHash": "8208899844976809115",
-        "version": "0.24.24.22086"
-      },
-      "description": "This template deploys Azure IoT Operations."
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "templateHash": "5277875297568178172",
+      "version": "0.25.53.49325"
     },
-    "outputs": {
-      "aioNamespace": {
-        "type": "string",
-        "value": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]"
-      },
-      "customLocationId": {
-        "type": "string",
-        "value": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]"
-      },
-      "customLocationName": {
-        "type": "string",
-        "value": "[parameters('customLocationName')]"
-      },
-      "mq": {
-        "type": "object",
-        "value": "[variables('MQ_PROPERTIES')]"
-      },
-      "observability": {
-        "type": "object",
-        "value": "[variables('OBSERVABILITY')]"
-      },
-      "processorInstanceName": {
-        "type": "string",
-        "value": "[parameters('dataProcessorInstanceName')]"
-      },
-      "targetName": {
-        "type": "string",
-        "value": "[parameters('targetName')]"
-      }
+    "description": "This template deploys Azure IoT Operations."
+  },
+  "outputs": {
+    "aioNamespace": {
+      "type": "string",
+      "value": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]"
     },
-    "parameters": {
-      "clusterLocation": {
-        "defaultValue": "[parameters('location')]",
-        "type": "string"
-      },
-      "clusterName": {
-        "type": "string"
-      },
-      "customLocationName": {
-        "defaultValue": "[format('{0}-cl', parameters('clusterName'))]",
-        "type": "string"
-      },
-      "dataProcessorCardinality": {
-        "defaultValue": {
-          "messageStore": 1,
-          "readerWorker": 1,
-          "runnerWorker": 1
-        },
-        "type": "object"
-      },
-      "dataProcessorInstanceName": {
-        "defaultValue": "[format('{0}-processor', toLower(parameters('clusterName')))]",
-        "type": "string"
-      },
-      "dataProcessorSecrets": {
-        "defaultValue": {
-          "secretProviderClassName": "aio-default-spc",
-          "servicePrincipalSecretRef": "aio-akv-sp"
-        },
-        "type": "object"
-      },
-      "deployResourceSyncRules": {
-        "defaultValue": true,
-        "type": "bool"
-      },
-      "location": {
-        "defaultValue": "[resourceGroup().location]",
-        "type": "string"
-      },
-      "mqAuthnName": {
-        "defaultValue": "authn",
-        "type": "string"
-      },
-      "mqBackendPartitions": {
-        "defaultValue": 2,
-        "minValue": 1,
-        "type": "int"
-      },
-      "mqBackendRedundancyFactor": {
-        "defaultValue": 2,
-        "minValue": 1,
-        "type": "int"
-      },
-      "mqBackendWorkers": {
-        "defaultValue": 2,
-        "minValue": 1,
-        "type": "int"
-      },
-      "mqBrokerName": {
-        "defaultValue": "broker",
-        "type": "string"
-      },
-      "mqFrontendReplicas": {
-        "defaultValue": 2,
-        "minValue": 1,
-        "type": "int"
-      },
-      "mqFrontendServer": {
-        "defaultValue": "mq-dmqtt-frontend",
-        "type": "string"
-      },
-      "mqFrontendWorkers": {
-        "defaultValue": 2,
-        "minValue": 1,
-        "type": "int"
-      },
-      "mqInstanceName": {
-        "defaultValue": "mq-instance",
-        "type": "string"
-      },
-      "mqListenerName": {
-        "defaultValue": "listener",
-        "type": "string"
-      },
-      "mqMemoryProfile": {
-        "allowedValues": [
-          "tiny",
-          "low",
-          "medium",
-          "high"
-        ],
-        "defaultValue": "medium",
-        "type": "string"
-      },
-      "mqMode": {
-        "allowedValues": [
-          "auto",
-          "distributed"
-        ],
-        "defaultValue": "distributed",
-        "type": "string"
-      },
-      "mqSecrets": {
-        "defaultValue": {
-          "enabled": true,
-          "secretProviderClassName": "aio-default-spc",
-          "servicePrincipalSecretRef": "aio-akv-sp"
-        },
-        "type": "object"
-      },
-      "mqServiceType": {
-        "allowedValues": [
-          "clusterIp",
-          "loadBalancer",
-          "nodePort"
-        ],
-        "defaultValue": "clusterIp",
-        "type": "string"
-      },
-      "opcUaBrokerSecrets": {
-        "defaultValue": {
-          "csiServicePrincipalSecretRef": "aio-akv-sp",
-          "kind": "csi"
-        },
-        "type": "object"
-      },
-      "opcuaDiscoveryEndpoint": {
-        "defaultValue": "opc.tcp://<NOT_SET>:<NOT_SET>",
-        "type": "string"
-      },
-      "simulatePLC": {
-        "defaultValue": false,
-        "type": "bool"
-      },
-      "targetName": {
-        "defaultValue": "[format('{0}-target', toLower(parameters('clusterName')))]",
-        "type": "string"
-      }
+    "customLocationId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]"
     },
-    "resources": [
-      {
-        "apiVersion": "2022-03-01",
-        "identity": {
-          "type": "SystemAssigned"
-        },
-        "name": "azure-iot-operations",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {
-            "Microsoft.CustomLocation.ServiceAccount": "default",
-            "aioTrust.configmapName": "[variables('AIO_TRUST_CONFIG_MAP')]",
-            "aioTrust.enabled": "true",
-            "aioTrust.issuerName": "[variables('AIO_TRUST_ISSUER')]",
-            "aioTrust.secretName": "[variables('AIO_TRUST_SECRET_NAME')]",
-            "genevaCollectorAddress": "[variables('OBSERVABILITY').genevaCollectorAddressNoProtocol]",
-            "otelCollectorAddress": "[variables('OBSERVABILITY').otelCollectorAddressNoProtocol]",
-            "rbac.cluster.admin": "true"
-          },
-          "extensionType": "microsoft.iotoperations",
-          "releaseTrain": "[variables('TRAINS').aio]",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').aio]"
-        },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+    "customLocationName": {
+      "type": "string",
+      "value": "[parameters('customLocationName')]"
+    },
+    "mq": {
+      "type": "object",
+      "value": "[variables('MQ_PROPERTIES')]"
+    },
+    "observability": {
+      "type": "object",
+      "value": "[variables('OBSERVABILITY')]"
+    },
+    "processorInstanceName": {
+      "type": "string",
+      "value": "[parameters('dataProcessorInstanceName')]"
+    },
+    "targetName": {
+      "type": "string",
+      "value": "[parameters('targetName')]"
+    }
+  },
+  "parameters": {
+    "clusterLocation": {
+      "defaultValue": "[parameters('location')]",
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    },
+    "containerRuntimeSocket": {
+      "defaultValue": "",
+      "type": "string"
+    },
+    "customLocationName": {
+      "defaultValue": "[format('{0}-cl', parameters('clusterName'))]",
+      "type": "string"
+    },
+    "dataProcessorInstanceName": {
+      "defaultValue": "[format('{0}-processor', toLower(parameters('clusterName')))]",
+      "type": "string"
+    },
+    "dataProcessorSecrets": {
+      "defaultValue": {
+        "secretProviderClassName": "aio-default-spc",
+        "servicePrincipalSecretRef": "aio-akv-sp"
       },
-      {
-        "apiVersion": "2022-03-01",
-        "dependsOn": [
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
-        ],
-        "name": "assets",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {
-            "Microsoft.CustomLocation.ServiceAccount": "default"
-          },
-          "extensionType": "microsoft.deviceregistry.assets",
-          "releaseTrain": "[variables('TRAINS').adr]",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').adr]"
-        },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+      "type": "object"
+    },
+    "deployResourceSyncRules": {
+      "defaultValue": true,
+      "type": "bool"
+    },
+    "kubernetesDistro": {
+      "allowedValues": [
+        "k3s",
+        "k8s",
+        "microk8s"
+      ],
+      "defaultValue": "k8s",
+      "type": "string"
+    },
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "type": "string"
+    },
+    "mqAuthnName": {
+      "defaultValue": "authn",
+      "type": "string"
+    },
+    "mqBackendPartitions": {
+      "defaultValue": 2,
+      "minValue": 1,
+      "type": "int"
+    },
+    "mqBackendRedundancyFactor": {
+      "defaultValue": 2,
+      "minValue": 1,
+      "type": "int"
+    },
+    "mqBackendWorkers": {
+      "defaultValue": 2,
+      "minValue": 1,
+      "type": "int"
+    },
+    "mqBrokerName": {
+      "defaultValue": "broker",
+      "type": "string"
+    },
+    "mqFrontendReplicas": {
+      "defaultValue": 2,
+      "minValue": 1,
+      "type": "int"
+    },
+    "mqFrontendServer": {
+      "defaultValue": "mq-dmqtt-frontend",
+      "type": "string"
+    },
+    "mqFrontendWorkers": {
+      "defaultValue": 2,
+      "minValue": 1,
+      "type": "int"
+    },
+    "mqInstanceName": {
+      "defaultValue": "mq-instance",
+      "type": "string"
+    },
+    "mqListenerName": {
+      "defaultValue": "listener",
+      "type": "string"
+    },
+    "mqMemoryProfile": {
+      "allowedValues": [
+        "tiny",
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultValue": "medium",
+      "type": "string"
+    },
+    "mqMode": {
+      "allowedValues": [
+        "auto",
+        "distributed"
+      ],
+      "defaultValue": "distributed",
+      "type": "string"
+    },
+    "mqSecrets": {
+      "defaultValue": {
+        "enabled": true,
+        "secretProviderClassName": "aio-default-spc",
+        "servicePrincipalSecretRef": "aio-akv-sp"
       },
-      {
-        "apiVersion": "2022-03-01",
-        "dependsOn": [
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
-        ],
-        "identity": {
-          "type": "SystemAssigned"
-        },
-        "name": "mq",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {
-            "global.openTelemetryCollectorAddr": "[variables('OBSERVABILITY').otelCollectorAddress]",
-            "global.quickstart": "false",
-            "secrets.enabled": "[parameters('mqSecrets').enabled]",
-            "secrets.secretProviderClassName": "[parameters('mqSecrets').secretProviderClassName]",
-            "secrets.servicePrincipalSecretRef": "[parameters('mqSecrets').servicePrincipalSecretRef]"
-          },
-          "extensionType": "microsoft.iotoperations.mq",
-          "releaseTrain": "[variables('TRAINS').mq]",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').mq]"
-        },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+      "type": "object"
+    },
+    "mqServiceType": {
+      "allowedValues": [
+        "clusterIp",
+        "loadBalancer",
+        "nodePort"
+      ],
+      "defaultValue": "clusterIp",
+      "type": "string"
+    },
+    "opcUaBrokerSecrets": {
+      "defaultValue": {
+        "csiServicePrincipalSecretRef": "aio-akv-sp",
+        "kind": "csi"
       },
-      {
-        "apiVersion": "2022-03-01",
-        "dependsOn": [
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
-        ],
-        "name": "processor",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {
-            "Microsoft.CustomLocation.ServiceAccount": "default",
-            "caTrust.configmapName": "[variables('AIO_TRUST_CONFIG_MAP')]",
-            "caTrust.enabled": "true",
-            "cardinality.readerWorker.replicas": "[parameters('dataProcessorCardinality').readerWorker]",
-            "cardinality.runnerWorker.replicas": "[parameters('dataProcessorCardinality').runnerWorker]",
-            "genevaCollectorAddress": "[variables('OBSERVABILITY').genevaCollectorAddressNoProtocol]",
-            "nats.config.cluster.replicas": "[parameters('dataProcessorCardinality').messageStore]",
-            "otelCollectorAddress": "[variables('OBSERVABILITY').otelCollectorAddressNoProtocol]",
-            "secrets.secretProviderClassName": "[parameters('dataProcessorSecrets').secretProviderClassName]",
-            "secrets.servicePrincipalSecretRef": "[parameters('dataProcessorSecrets').servicePrincipalSecretRef]",
-            "serviceAccountTokens.MQClient.audience": "[variables('MQ_PROPERTIES').satAudience]"
-          },
-          "extensionType": "microsoft.iotoperations.dataprocessor",
-          "releaseTrain": "[variables('TRAINS').processor]",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').processor]"
-        },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+      "type": "object"
+    },
+    "opcuaDiscoveryEndpoint": {
+      "defaultValue": "opc.tcp://<NOT_SET>:<NOT_SET>",
+      "type": "string"
+    },
+    "simulatePLC": {
+      "defaultValue": false,
+      "type": "bool"
+    },
+    "targetName": {
+      "defaultValue": "[format('{0}-target', toLower(parameters('clusterName')))]",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2022-03-01",
+      "identity": {
+        "type": "SystemAssigned"
       },
-      {
-        "apiVersion": "2022-03-01",
-        "dependsOn": [
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
-        ],
-        "name": "akri",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {
-            "webhookConfiguration.enabled": "false"
-          },
-          "extensionType": "microsoft.iotoperations.akri",
-          "releaseTrain": "[variables('TRAINS').akri]",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').akri]"
+      "name": "azure-iot-operations",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {
+          "Microsoft.CustomLocation.ServiceAccount": "default",
+          "aioTrust.configmapName": "[variables('AIO_TRUST_CONFIG_MAP')]",
+          "aioTrust.enabled": "true",
+          "aioTrust.issuerName": "[variables('AIO_TRUST_ISSUER')]",
+          "aioTrust.secretName": "[variables('AIO_TRUST_SECRET_NAME')]",
+          "genevaCollectorAddress": "[variables('OBSERVABILITY').genevaCollectorAddressNoProtocol]",
+          "otelCollectorAddress": "[variables('OBSERVABILITY').otelCollectorAddressNoProtocol]",
+          "rbac.cluster.admin": "true"
         },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+        "extensionType": "microsoft.iotoperations",
+        "releaseTrain": "[variables('TRAINS').aio]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').aio]"
       },
-      {
-        "apiVersion": "2022-03-01",
-        "condition": false,
-        "dependsOn": [
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
-        ],
-        "name": "opc-ua-broker",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {
-            "mqttBroker.address": "[variables('MQ_PROPERTIES').localUrl]",
-            "mqttBroker.authenticationMethod": "serviceAccountToken",
-            "mqttBroker.caCertConfigMapRef ": "[variables('AIO_TRUST_CONFIG_MAP')]",
-            "mqttBroker.caCertKey": "[variables('AIO_TRUST_CONFIG_MAP_KEY')]",
-            "mqttBroker.connectUserProperties.metriccategory": "aio-opc",
-            "mqttBroker.serviceAccountTokenAudience": "[variables('MQ_PROPERTIES').satAudience]",
-            "opcPlcSimulation.deploy": "[format('{0}', parameters('simulatePLC'))]",
-            "openTelemetry.enabled": "true",
-            "openTelemetry.endpoints.default.emitLogs": "false",
-            "openTelemetry.endpoints.default.emitMetrics": "true",
-            "openTelemetry.endpoints.default.emitTraces": "false",
-            "openTelemetry.endpoints.default.protocol": "grpc",
-            "openTelemetry.endpoints.default.uri": "[variables('OBSERVABILITY').otelCollectorAddress]",
-            "openTelemetry.endpoints.geneva.emitLogs": "false",
-            "openTelemetry.endpoints.geneva.emitMetrics": "true",
-            "openTelemetry.endpoints.geneva.emitTraces": "false",
-            "openTelemetry.endpoints.geneva.protocol": "grpc",
-            "openTelemetry.endpoints.geneva.temporalityPreference": "delta",
-            "openTelemetry.endpoints.geneva.uri": "[variables('OBSERVABILITY').genevaCollectorAddress]",
-            "secrets.csiDriver": "secrets-store.csi.k8s.io",
-            "secrets.csiServicePrincipalSecretRef": "[parameters('opcUaBrokerSecrets').csiServicePrincipalSecretRef]",
-            "secrets.kind": "[parameters('opcUaBrokerSecrets').kind]"
-          },
-          "extensionType": "microsoft.iotoperations.opcuabroker",
-          "releaseTrain": "private-preview",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').opcUaBroker]"
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
+      ],
+      "name": "assets",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {
+          "Microsoft.CustomLocation.ServiceAccount": "default"
         },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+        "extensionType": "microsoft.deviceregistry.assets",
+        "releaseTrain": "[variables('TRAINS').adr]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').adr]"
       },
-      {
-        "apiVersion": "2022-03-01",
-        "dependsOn": [
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
-        ],
-        "name": "layered-networking",
-        "properties": {
-          "autoUpgradeMinorVersion": false,
-          "configurationSettings": {},
-          "extensionType": "microsoft.iotoperations.layerednetworkmanagement",
-          "releaseTrain": "[variables('TRAINS').layeredNetworking]",
-          "scope": "[variables('AIO_EXTENSION_SCOPE')]",
-          "version": "[variables('VERSIONS').layeredNetworking]"
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "name": "mq",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {
+          "global.openTelemetryCollectorAddr": "[variables('OBSERVABILITY').otelCollectorAddress]",
+          "global.quickstart": "false",
+          "secrets.enabled": "[parameters('mqSecrets').enabled]",
+          "secrets.secretProviderClassName": "[parameters('mqSecrets').secretProviderClassName]",
+          "secrets.servicePrincipalSecretRef": "[parameters('mqSecrets').servicePrincipalSecretRef]"
         },
-        "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
-        "type": "Microsoft.KubernetesConfiguration/extensions"
+        "extensionType": "microsoft.iotoperations.mq",
+        "releaseTrain": "[variables('TRAINS').mq]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').mq]"
       },
-      {
-        "apiVersion": "2021-08-31-preview",
-        "dependsOn": [
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "name": "processor",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {
+          "Microsoft.CustomLocation.ServiceAccount": "default",
+          "caTrust.configmapName": "[variables('AIO_TRUST_CONFIG_MAP')]",
+          "caTrust.enabled": "true",
+          "genevaCollectorAddress": "[variables('OBSERVABILITY').genevaCollectorAddressNoProtocol]",
+          "otelCollectorAddress": "[variables('OBSERVABILITY').otelCollectorAddressNoProtocol]",
+          "secrets.secretProviderClassName": "[parameters('dataProcessorSecrets').secretProviderClassName]",
+          "secrets.servicePrincipalSecretRef": "[parameters('dataProcessorSecrets').servicePrincipalSecretRef]",
+          "serviceAccountTokens.MQClient.audience": "[variables('MQ_PROPERTIES').satAudience]"
+        },
+        "extensionType": "microsoft.iotoperations.dataprocessor",
+        "releaseTrain": "[variables('TRAINS').processor]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').processor]"
+      },
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
+      ],
+      "name": "akri",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {
+          "agent.host.containerRuntimeSocket": "[parameters('containerRuntimeSocket')]",
+          "certManagerWebhookCertificate.enabled": "true",
+          "kubernetesDistro": "[parameters('kubernetesDistro')]",
+          "webhookConfiguration.enabled": "true"
+        },
+        "extensionType": "microsoft.iotoperations.akri",
+        "releaseTrain": "[variables('TRAINS').akri]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').akri]"
+      },
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]",
+        "[resourceId('Microsoft.IoTOperationsMQ/mq', parameters('mqInstanceName'))]",
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'mq')]"
+      ],
+      "name": "opc-ua-broker",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {
+          "mqttBroker.address": "[variables('MQ_PROPERTIES').localUrl]",
+          "mqttBroker.authenticationMethod": "serviceAccountToken",
+          "mqttBroker.caCertConfigMapRef": "[variables('AIO_TRUST_CONFIG_MAP')]",
+          "mqttBroker.caCertKey": "[variables('AIO_TRUST_CONFIG_MAP_KEY')]",
+          "mqttBroker.connectUserProperties.metriccategory": "aio-opc",
+          "mqttBroker.serviceAccountTokenAudience": "[variables('MQ_PROPERTIES').satAudience]",
+          "opcPlcSimulation.deploy": "[format('{0}', parameters('simulatePLC'))]",
+          "opcPlcSimulation.autoAcceptUntrustedCertificates": "true",
+          "openTelemetry.enabled": "true",
+          "openTelemetry.endpoints.default.emitLogs": "false",
+          "openTelemetry.endpoints.default.emitMetrics": "true",
+          "openTelemetry.endpoints.default.emitTraces": "false",
+          "openTelemetry.endpoints.default.protocol": "grpc",
+          "openTelemetry.endpoints.default.uri": "[variables('OBSERVABILITY').otelCollectorAddress]",
+          "openTelemetry.endpoints.geneva.emitLogs": "false",
+          "openTelemetry.endpoints.geneva.emitMetrics": "true",
+          "openTelemetry.endpoints.geneva.emitTraces": "false",
+          "openTelemetry.endpoints.geneva.protocol": "grpc",
+          "openTelemetry.endpoints.geneva.temporalityPreference": "delta",
+          "openTelemetry.endpoints.geneva.uri": "[variables('OBSERVABILITY').genevaCollectorAddress]",
+          "secrets.csiDriver": "secrets-store.csi.k8s.io",
+          "secrets.csiServicePrincipalSecretRef": "[parameters('opcUaBrokerSecrets').csiServicePrincipalSecretRef]",
+          "secrets.kind": "[parameters('opcUaBrokerSecrets').kind]"
+        },
+        "extensionType": "microsoft.iotoperations.opcuabroker",
+        "releaseTrain": "[variables('TRAINS').opcUaBroker]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').opcUaBroker]"
+      },
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]"
+      ],
+      "name": "layered-networking",
+      "properties": {
+        "autoUpgradeMinorVersion": false,
+        "configurationSettings": {},
+        "extensionType": "microsoft.iotoperations.layerednetworkmanagement",
+        "releaseTrain": "[variables('TRAINS').layeredNetworking]",
+        "scope": "[variables('AIO_EXTENSION_SCOPE')]",
+        "version": "[variables('VERSIONS').layeredNetworking]"
+      },
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('clusterName'))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions"
+    },
+    {
+      "apiVersion": "2021-08-31-preview",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]",
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'processor')]",
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'assets')]",
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'mq')]"
+      ],
+      "location": "[parameters('clusterLocation')]",
+      "name": "[parameters('customLocationName')]",
+      "properties": {
+        "clusterExtensionIds": [
           "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]",
-          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'processor')]",
           "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'assets')]",
+          "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'processor')]",
           "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'mq')]"
         ],
-        "location": "[parameters('clusterLocation')]",
-        "name": "[parameters('customLocationName')]",
-        "properties": {
-          "clusterExtensionIds": [
-            "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'azure-iot-operations')]",
-            "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'assets')]",
-            "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'processor')]",
-            "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName')), 'Microsoft.KubernetesConfiguration/extensions', 'mq')]"
-          ],
-          "displayName": "[parameters('customLocationName')]",
-          "hostResourceId": "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName'))]",
-          "namespace": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]"
-        },
-        "type": "Microsoft.ExtendedLocation/customLocations"
+        "displayName": "[parameters('customLocationName')]",
+        "hostResourceId": "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('clusterName'))]",
+        "namespace": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]"
       },
-      {
-        "apiVersion": "2021-08-31-preview",
-        "condition": "[parameters('deployResourceSyncRules')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]"
-        ],
-        "location": "[parameters('clusterLocation')]",
-        "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-aio-sync', parameters('customLocationName')))]",
-        "properties": {
-          "priority": 100,
-          "selector": {
-            "matchLabels": {
-              "management.azure.com/provider-name": "microsoft.iotoperationsorchestrator"
-            }
-          },
-          "targetResourceGroup": "[resourceGroup().id]"
-        },
-        "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
-      },
-      {
-        "apiVersion": "2021-08-31-preview",
-        "condition": "[parameters('deployResourceSyncRules')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-mq-sync', parameters('customLocationName')))]"
-        ],
-        "location": "[parameters('clusterLocation')]",
-        "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-adr-sync', parameters('customLocationName')))]",
-        "properties": {
-          "priority": 200,
-          "selector": {
-            "matchLabels": {
-              "management.azure.com/provider-name": "Microsoft.DeviceRegistry"
-            }
-          },
-          "targetResourceGroup": "[resourceGroup().id]"
-        },
-        "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
-      },
-      {
-        "apiVersion": "2021-08-31-preview",
-        "condition": "[parameters('deployResourceSyncRules')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-aio-sync', parameters('customLocationName')))]"
-        ],
-        "location": "[parameters('clusterLocation')]",
-        "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-dp-sync', parameters('customLocationName')))]",
-        "properties": {
-          "priority": 300,
-          "selector": {
-            "matchLabels": {
-              "management.azure.com/provider-name": "microsoft.iotoperationsdataprocessor"
-            }
-          },
-          "targetResourceGroup": "[resourceGroup().id]"
-        },
-        "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
-      },
-      {
-        "apiVersion": "2021-08-31-preview",
-        "condition": "[parameters('deployResourceSyncRules')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-dp-sync', parameters('customLocationName')))]"
-        ],
-        "location": "[parameters('clusterLocation')]",
-        "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-mq-sync', parameters('customLocationName')))]",
-        "properties": {
-          "priority": 400,
-          "selector": {
-            "matchLabels": {
-              "management.azure.com/provider-name": "microsoft.iotoperationsmq"
-            }
-          },
-          "targetResourceGroup": "[resourceGroup().id]"
-        },
-        "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
-      },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-dp-sync', parameters('customLocationName')))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
-        },
-        "location": "[parameters('location')]",
-        "name": "[parameters('dataProcessorInstanceName')]",
-        "properties": {},
-        "type": "Microsoft.IoTOperationsDataProcessor/instances"
-      },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-mq-sync', parameters('customLocationName')))]",
-          "[resourceId('Microsoft.IoTOperationsOrchestrator/targets', parameters('targetName'))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
-        },
-        "location": "[parameters('location')]",
-        "name": "[parameters('mqInstanceName')]",
-        "properties": {},
-        "type": "Microsoft.IoTOperationsMQ/mq"
-      },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.IoTOperationsMQ/mq', parameters('mqInstanceName'))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
-        },
-        "location": "[parameters('location')]",
-        "name": "[format('{0}/{1}', parameters('mqInstanceName'), parameters('mqBrokerName'))]",
-        "properties": {
-          "authImage": {
-            "pullPolicy": "Always",
-            "repository": "[format('{0}/dmqtt-authentication', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
-            "tag": "[variables('VERSIONS').mq]"
-          },
-          "brokerImage": {
-            "pullPolicy": "Always",
-            "repository": "[format('{0}/dmqtt-pod', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
-            "tag": "[variables('VERSIONS').mq]"
-          },
-          "cardinality": {
-            "backendChain": {
-              "partitions": "[parameters('mqBackendPartitions')]",
-              "redundancyFactor": "[parameters('mqBackendRedundancyFactor')]",
-              "workers": "[parameters('mqBackendWorkers')]"
-            },
-            "frontend": {
-              "replicas": "[parameters('mqFrontendReplicas')]",
-              "workers": "[parameters('mqFrontendWorkers')]"
-            }
-          },
-          "diagnostics": {
-            "enableSelfCheck": true,
-            "probeImage": "[format('{0}/diagnostics-probe:{1}', variables('CONTAINER_REGISTRY_DOMAINS').mq, variables('VERSIONS').mq)]"
-          },
-          "healthManagerImage": {
-            "pullPolicy": "Always",
-            "repository": "[format('{0}/dmqtt-operator', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
-            "tag": "[variables('VERSIONS').mq]"
-          },
-          "memoryProfile": "[parameters('mqMemoryProfile')]",
-          "mode": "[parameters('mqMode')]"
-        },
-        "type": "Microsoft.IoTOperationsMQ/mq/broker"
-      },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.IoTOperationsMQ/mq', parameters('mqInstanceName'))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
-        },
-        "location": "[parameters('location')]",
-        "name": "[format('{0}/{1}', parameters('mqInstanceName'), 'diagnostics')]",
-        "properties": {
-          "image": {
-            "repository": "[format('{0}/diagnostics-service', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
-            "tag": "[variables('VERSIONS').mq]"
-          },
-          "logFormat": "text",
-          "logLevel": "info",
-          "openTelemetryTracesCollectorAddr": "[variables('OBSERVABILITY').otelCollectorAddress]"
-        },
-        "type": "Microsoft.IoTOperationsMQ/mq/diagnosticService"
-      },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.IoTOperationsMQ/mq/broker', parameters('mqInstanceName'), parameters('mqBrokerName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
-        },
-        "location": "[parameters('location')]",
-        "name": "[format('{0}/{1}/{2}', parameters('mqInstanceName'), parameters('mqBrokerName'), parameters('mqListenerName'))]",
-        "properties": {
-          "authenticationEnabled": true,
-          "authorizationEnabled": false,
-          "brokerRef": "[parameters('mqBrokerName')]",
-          "port": 8883,
-          "serviceType": "[parameters('mqServiceType')]",
-          "tls": {
-            "automatic": {
-              "issuerRef": {
-                "group": "cert-manager.io",
-                "kind": "Issuer",
-                "name": "[parameters('mqFrontendServer')]"
-              }
-            }
+      "type": "Microsoft.ExtendedLocation/customLocations"
+    },
+    {
+      "apiVersion": "2021-08-31-preview",
+      "condition": "[parameters('deployResourceSyncRules')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]"
+      ],
+      "location": "[parameters('clusterLocation')]",
+      "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-aio-sync', parameters('customLocationName')))]",
+      "properties": {
+        "priority": 100,
+        "selector": {
+          "matchLabels": {
+            "management.azure.com/provider-name": "microsoft.iotoperationsorchestrator"
           }
         },
-        "type": "Microsoft.IoTOperationsMQ/mq/broker/listener"
+        "targetResourceGroup": "[resourceGroup().id]"
       },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.IoTOperationsMQ/mq/broker', parameters('mqInstanceName'), parameters('mqBrokerName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.IoTOperationsMQ/mq/broker/listener', parameters('mqInstanceName'), parameters('mqBrokerName'), parameters('mqListenerName'))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
+      "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
+    },
+    {
+      "apiVersion": "2021-08-31-preview",
+      "condition": "[parameters('deployResourceSyncRules')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-mq-sync', parameters('customLocationName')))]"
+      ],
+      "location": "[parameters('clusterLocation')]",
+      "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-adr-sync', parameters('customLocationName')))]",
+      "properties": {
+        "priority": 200,
+        "selector": {
+          "matchLabels": {
+            "management.azure.com/provider-name": "Microsoft.DeviceRegistry"
+          }
         },
-        "location": "[parameters('location')]",
-        "name": "[format('{0}/{1}/{2}', parameters('mqInstanceName'), parameters('mqBrokerName'), parameters('mqAuthnName'))]",
-        "properties": {
-          "authenticationMethods": [
-            {
-              "sat": {
-                "audiences": [
-                  "[variables('MQ_PROPERTIES').satAudience]"
-                ]
-              }
-            }
-          ],
-          "listenerRef": [
-            "[parameters('mqListenerName')]"
-          ]
-        },
-        "type": "Microsoft.IoTOperationsMQ/mq/broker/authentication"
+        "targetResourceGroup": "[resourceGroup().id]"
       },
-      {
-        "apiVersion": "2023-10-04-preview",
-        "dependsOn": [
-          "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-aio-sync', parameters('customLocationName')))]"
-        ],
-        "extendedLocation": {
-          "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
-          "type": "CustomLocation"
+      "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
+    },
+    {
+      "apiVersion": "2021-08-31-preview",
+      "condition": "[parameters('deployResourceSyncRules')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-aio-sync', parameters('customLocationName')))]"
+      ],
+      "location": "[parameters('clusterLocation')]",
+      "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-dp-sync', parameters('customLocationName')))]",
+      "properties": {
+        "priority": 300,
+        "selector": {
+          "matchLabels": {
+            "management.azure.com/provider-name": "microsoft.iotoperationsdataprocessor"
+          }
         },
-        "location": "[parameters('location')]",
-        "name": "[parameters('targetName')]",
-        "properties": {
-          "components": [
-            "[variables('observability_helmChart')]",
-            "[variables('akri_daemonset')]",
-            "[variables('asset_configuration')]",
-            "[variables('opc_ua_broker_helmChart')]",
-            "[variables('broker_fe_issuer_configuration')]"
-          ],
-          "scope": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]",
-          "topologies": [
-            {
-              "bindings": [
-                {
-                  "config": {
-                    "inCluster": "true"
-                  },
-                  "provider": "providers.target.helm",
-                  "role": "helm.v3"
-                },
-                {
-                  "config": {
-                    "inCluster": "true"
-                  },
-                  "provider": "providers.target.kubectl",
-                  "role": "yaml.k8s"
-                }
-              ]
+        "targetResourceGroup": "[resourceGroup().id]"
+      },
+      "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
+    },
+    {
+      "apiVersion": "2021-08-31-preview",
+      "condition": "[parameters('deployResourceSyncRules')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-dp-sync', parameters('customLocationName')))]"
+      ],
+      "location": "[parameters('clusterLocation')]",
+      "name": "[format('{0}/{1}', parameters('customLocationName'), format('{0}-mq-sync', parameters('customLocationName')))]",
+      "properties": {
+        "priority": 400,
+        "selector": {
+          "matchLabels": {
+            "management.azure.com/provider-name": "microsoft.iotoperationsmq"
+          }
+        },
+        "targetResourceGroup": "[resourceGroup().id]"
+      },
+      "type": "Microsoft.ExtendedLocation/customLocations/resourceSyncRules"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-dp-sync', parameters('customLocationName')))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
+      },
+      "location": "[parameters('location')]",
+      "name": "[parameters('dataProcessorInstanceName')]",
+      "properties": {},
+      "type": "Microsoft.IoTOperationsDataProcessor/instances"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-mq-sync', parameters('customLocationName')))]",
+        "[resourceId('Microsoft.IoTOperationsOrchestrator/targets', parameters('targetName'))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
+      },
+      "location": "[parameters('location')]",
+      "name": "[parameters('mqInstanceName')]",
+      "properties": {},
+      "type": "Microsoft.IoTOperationsMQ/mq"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.IoTOperationsMQ/mq', parameters('mqInstanceName'))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
+      },
+      "location": "[parameters('location')]",
+      "name": "[format('{0}/{1}', parameters('mqInstanceName'), parameters('mqBrokerName'))]",
+      "properties": {
+        "authImage": {
+          "pullPolicy": "Always",
+          "repository": "[format('{0}/dmqtt-authentication', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
+          "tag": "[format('{0}-rc3', variables('VERSIONS').mq)]"
+        },
+        "brokerImage": {
+          "pullPolicy": "Always",
+          "repository": "[format('{0}/dmqtt-pod', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
+          "tag": "[format('{0}-rc3', variables('VERSIONS').mq)]"
+        },
+        "cardinality": {
+          "backendChain": {
+            "partitions": "[parameters('mqBackendPartitions')]",
+            "redundancyFactor": "[parameters('mqBackendRedundancyFactor')]",
+            "workers": "[parameters('mqBackendWorkers')]"
+          },
+          "frontend": {
+            "replicas": "[parameters('mqFrontendReplicas')]",
+            "workers": "[parameters('mqFrontendWorkers')]"
+          }
+        },
+        "diagnostics": {
+          "enableSelfCheck": true,
+          "probeImage": "[format('{0}/diagnostics-probe:{1}-rc3', variables('CONTAINER_REGISTRY_DOMAINS').mq, variables('VERSIONS').mq)]"
+        },
+        "healthManagerImage": {
+          "pullPolicy": "Always",
+          "repository": "[format('{0}/dmqtt-operator', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
+          "tag": "[format('{0}-rc3', variables('VERSIONS').mq)]"
+        },
+        "memoryProfile": "[parameters('mqMemoryProfile')]",
+        "mode": "[parameters('mqMode')]"
+      },
+      "type": "Microsoft.IoTOperationsMQ/mq/broker"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.IoTOperationsMQ/mq', parameters('mqInstanceName'))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
+      },
+      "location": "[parameters('location')]",
+      "name": "[format('{0}/{1}', parameters('mqInstanceName'), 'diagnostics')]",
+      "properties": {
+        "image": {
+          "repository": "[format('{0}/diagnostics-service', variables('CONTAINER_REGISTRY_DOMAINS').mq)]",
+          "tag": "[format('{0}-rc3', variables('VERSIONS').mq)]"
+        },
+        "logFormat": "text",
+        "logLevel": "info",
+        "openTelemetryTracesCollectorAddr": "[variables('OBSERVABILITY').otelCollectorAddress]"
+      },
+      "type": "Microsoft.IoTOperationsMQ/mq/diagnosticService"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.IoTOperationsMQ/mq/broker', parameters('mqInstanceName'), parameters('mqBrokerName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
+      },
+      "location": "[parameters('location')]",
+      "name": "[format('{0}/{1}/{2}', parameters('mqInstanceName'), parameters('mqBrokerName'), parameters('mqListenerName'))]",
+      "properties": {
+        "authenticationEnabled": true,
+        "authorizationEnabled": false,
+        "brokerRef": "[parameters('mqBrokerName')]",
+        "port": 8883,
+        "serviceType": "[parameters('mqServiceType')]",
+        "tls": {
+          "automatic": {
+            "issuerRef": {
+              "group": "cert-manager.io",
+              "kind": "Issuer",
+              "name": "[parameters('mqFrontendServer')]"
             }
-          ],
-          "version": "[deployment().properties.template.contentVersion]"
-        },
-        "type": "Microsoft.IoTOperationsOrchestrator/targets"
-      }
-    ],
-    "variables": {
-      "AIO_CLUSTER_RELEASE_NAMESPACE": "azure-iot-operations",
-      "AIO_EXTENSION_SCOPE": {
-        "cluster": {
-          "releaseNamespace": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]"
+          }
         }
       },
-      "AIO_TRUST_CONFIG_MAP": "aio-ca-trust-bundle-test-only",
-      "AIO_TRUST_CONFIG_MAP_KEY": "ca.crt",
-      "AIO_TRUST_ISSUER": "aio-ca-issuer",
-      "AIO_TRUST_SECRET_NAME": "aio-ca-key-pair-test-only",
-      "CONTAINER_REGISTRY_DOMAINS": {
-        "mq": "[variables('DEFAULT_CONTAINER_REGISTRY')]",
-        "opcUaBroker": "[variables('DEFAULT_CONTAINER_REGISTRY')]"
+      "type": "Microsoft.IoTOperationsMQ/mq/broker/listener"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.IoTOperationsMQ/mq/broker', parameters('mqInstanceName'), parameters('mqBrokerName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.IoTOperationsMQ/mq/broker/listener', parameters('mqInstanceName'), parameters('mqBrokerName'), parameters('mqListenerName'))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
       },
-      "DEFAULT_CONTAINER_REGISTRY": "mcr.microsoft.com/azureiotoperations",
-      "MQ_PROPERTIES": {
-        "domain": "[format('aio-mq-dmqtt-frontend.{0}', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
-        "localUrl": "[format('mqtts://aio-mq-dmqtt-frontend.{0}:8883', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
-        "name": "aio-mq-dmqtt-frontend",
-        "port": 8883,
-        "satAudience": "aio-mq"
+      "location": "[parameters('location')]",
+      "name": "[format('{0}/{1}/{2}', parameters('mqInstanceName'), parameters('mqBrokerName'), parameters('mqAuthnName'))]",
+      "properties": {
+        "authenticationMethods": [
+          {
+            "sat": {
+              "audiences": [
+                "[variables('MQ_PROPERTIES').satAudience]"
+              ]
+            }
+          }
+        ],
+        "listenerRef": [
+          "[parameters('mqListenerName')]"
+        ]
       },
-      "OBSERVABILITY": {
-        "genevaCollectorAddress": "[format('http://geneva-metrics-service.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
-        "genevaCollectorAddressNoProtocol": "[format('geneva-metrics-service.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
-        "otelCollectorAddress": "[format('http://aio-otel-collector.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
-        "otelCollectorAddressNoProtocol": "[format('aio-otel-collector.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]"
+      "type": "Microsoft.IoTOperationsMQ/mq/broker/authentication"
+    },
+    {
+      "apiVersion": "2023-10-04-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "[resourceId('Microsoft.ExtendedLocation/customLocations/resourceSyncRules', parameters('customLocationName'), format('{0}-aio-sync', parameters('customLocationName')))]"
+      ],
+      "extendedLocation": {
+        "name": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+        "type": "CustomLocation"
       },
-      "TRAINS": {
-        "adr": "preview",
-        "aio": "preview",
-        "akri": "preview",
-        "layeredNetworking": "preview",
-        "mq": "preview",
-        "processor": "preview"
+      "location": "[parameters('location')]",
+      "name": "[parameters('targetName')]",
+      "properties": {
+        "components": [
+          "[variables('observability_helmChart')]",
+          "[variables('akri_daemonset')]",
+          "[variables('asset_configuration')]",
+          "[variables('broker_fe_issuer_configuration')]"
+        ],
+        "scope": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]",
+        "topologies": [
+          {
+            "bindings": [
+              {
+                "config": {
+                  "inCluster": "true"
+                },
+                "provider": "providers.target.helm",
+                "role": "helm.v3"
+              },
+              {
+                "config": {
+                  "inCluster": "true"
+                },
+                "provider": "providers.target.kubectl",
+                "role": "yaml.k8s"
+              }
+            ]
+          }
+        ],
+        "version": "[deployment().properties.template.contentVersion]"
       },
-      "VERSIONS": {
-        "adr": "0.1.0-preview",
-        "aio": "0.3.0-preview",
-        "akri": "0.1.0-preview",
-        "layeredNetworking": "0.1.0-preview",
-        "mq": "0.2.0-preview",
-        "observability": "0.1.0-preview",
-        "opcUaBroker": "0.2.0-preview",
-        "processor": "0.1.2-preview"
-      },
-      "akri": {
-        "opcUaDiscoveryDetails": "[format('opcuaDiscoveryMethod:\n  - asset:\n      endpointUrl: \"{0}\"\n      useSecurity: false\n      autoAcceptUntrustedCertificates: true\n      userName: \"user1\"\n      password: \"password\"  \n', parameters('opcuaDiscoveryEndpoint'))]"
-      },
-      "akri_daemonset": {
-        "name": "aio-opc-asset-discovery",
-        "properties": {
-          "resource": {
-            "apiVersion": "apps/v1",
-            "kind": "DaemonSet",
-            "metadata": {
-              "name": "aio-opc-asset-discovery"
+      "type": "Microsoft.IoTOperationsOrchestrator/targets"
+    }
+  ],
+  "variables": {
+    "AIO_CLUSTER_RELEASE_NAMESPACE": "azure-iot-operations",
+    "AIO_EXTENSION_SCOPE": {
+      "cluster": {
+        "releaseNamespace": "[variables('AIO_CLUSTER_RELEASE_NAMESPACE')]"
+      }
+    },
+    "AIO_TRUST_CONFIG_MAP": "aio-ca-trust-bundle-test-only",
+    "AIO_TRUST_CONFIG_MAP_KEY": "ca.crt",
+    "AIO_TRUST_ISSUER": "aio-ca-issuer",
+    "AIO_TRUST_SECRET_NAME": "aio-ca-key-pair-test-only",
+    "CONTAINER_REGISTRY_DOMAINS": {
+      "mq": "[variables('DEFAULT_CONTAINER_REGISTRY')]",
+      "opcUaBroker": "[variables('DEFAULT_CONTAINER_REGISTRY')]"
+    },
+    "DEFAULT_CONTAINER_REGISTRY": "mcr.microsoft.com/azureiotoperations",
+    "MQ_PROPERTIES": {
+      "domain": "[format('aio-mq-dmqtt-frontend.{0}', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
+      "localUrl": "[format('mqtts://aio-mq-dmqtt-frontend.{0}:8883', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
+      "name": "aio-mq-dmqtt-frontend",
+      "port": 8883,
+      "satAudience": "aio-mq"
+    },
+    "OBSERVABILITY": {
+      "genevaCollectorAddress": "[format('http://geneva-metrics-service.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
+      "genevaCollectorAddressNoProtocol": "[format('geneva-metrics-service.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
+      "otelCollectorAddress": "[format('http://aio-otel-collector.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
+      "otelCollectorAddressNoProtocol": "[format('aio-otel-collector.{0}.svc.cluster.local:4317', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]"
+    },
+    "TRAINS": {
+      "adr": "preview",
+      "aio": "preview",
+      "akri": "preview",
+      "layeredNetworking": "preview",
+      "mq": "preview",
+      "opcUaBroker": "preview",
+      "processor": "preview"
+    },
+    "VERSIONS": {
+      "adr": "0.1.0-preview",
+      "aio": "0.4.0-preview",
+      "akri": "0.2.1-preview",
+      "layeredNetworking": "0.1.0-preview",
+      "mq": "0.3.0-preview",
+      "observability": "0.1.0-preview",
+      "opcUaBroker": "0.3.0-preview",
+      "processor": "0.2.0-preview"
+    },
+    "akri": {
+      "opcUaDiscoveryDetails": "[format('opcuaDiscoveryMethod:\n  - asset:\n      endpointUrl: \"{0}\"\n      useSecurity: false\n      autoAcceptUntrustedCertificates: true\n      userName: \"user1\"\n      password: \"password\"  \n', parameters('opcuaDiscoveryEndpoint'))]"
+    },
+    "akri_daemonset": {
+      "name": "aio-opc-asset-discovery",
+      "properties": {
+        "resource": {
+          "apiVersion": "apps/v1",
+          "kind": "DaemonSet",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "aio"
             },
-            "spec": {
-              "selector": {
-                "matchLabels": {
+            "name": "aio-opc-asset-discovery"
+          },
+          "spec": {
+            "selector": {
+              "matchLabels": {
+                "name": "aio-opc-asset-discovery"
+              }
+            },
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app.kubernetes.io/part-of": "aio",
                   "name": "aio-opc-asset-discovery"
                 }
               },
-              "template": {
-                "metadata": {
-                  "labels": {
-                    "name": "aio-opc-asset-discovery"
-                  }
-                },
-                "spec": {
-                  "containers": [
-                    {
-                      "env": [
-                        {
-                          "name": "POD_IP",
-                          "valueFrom": {
-                            "fieldRef": {
-                              "fieldPath": "status.podIP"
-                            }
-                          }
-                        },
-                        {
-                          "name": "DISCOVERY_HANDLERS_DIRECTORY",
-                          "value": "/var/lib/akri"
-                        }
-                      ],
-                      "image": "[format('{0}/opcuabroker/discovery-handler:{1}', variables('CONTAINER_REGISTRY_DOMAINS').opcUaBroker, variables('VERSIONS').opcUaBroker)]",
-                      "imagePullPolicy": "Always",
-                      "name": "aio-opc-asset-discovery",
-                      "ports": [
-                        {
-                          "containerPort": 80,
-                          "name": "discovery"
-                        }
-                      ],
-                      "resources": {
-                        "limits": {
-                          "cpu": "100m",
-                          "memory": "300Mi"
-                        },
-                        "requests": {
-                          "cpu": "10m",
-                          "memory": "64Mi"
-                        }
+              "spec": {
+                "containers": [
+                  {
+                    "env": [
+                      {
+                        "name": "DISCOVERY_HANDLERS_DIRECTORY",
+                        "value": "/var/lib/akri"
                       },
-                      "volumeMounts": [
-                        {
-                          "mountPath": "/var/lib/akri",
-                          "name": "discovery-handlers"
-                        }
-                      ]
-                    }
-                  ],
-                  "volumes": [
-                    {
-                      "hostPath": {
-                        "path": "/var/lib/akri"
-                      },
-                      "name": "discovery-handlers"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "type": "yaml.k8s"
-      },
-      "asset_configuration": {
-        "name": "akri-opcua-asset",
-        "properties": {
-          "resource": {
-            "apiVersion": "akri.sh/v0",
-            "kind": "Configuration",
-            "metadata": {
-              "name": "akri-opcua-asset"
-            },
-            "spec": {
-              "brokerProperties": {},
-              "capacity": 1,
-              "discoveryHandler": {
-                "discoveryDetails": "[variables('akri').opcUaDiscoveryDetails]",
-                "name": "opcua-asset"
-              }
-            }
-          }
-        },
-        "type": "yaml.k8s"
-      },
-      "broker_fe_issuer_configuration": {
-        "name": "mq-fe-issuer-configuration",
-        "properties": {
-          "resource": {
-            "apiVersion": "cert-manager.io/v1",
-            "kind": "Issuer",
-            "metadata": {
-              "name": "[parameters('mqFrontendServer')]"
-            },
-            "spec": {
-              "ca": {
-                "secretName": "[variables('AIO_TRUST_SECRET_NAME')]"
-              }
-            }
-          }
-        },
-        "type": "yaml.k8s"
-      },
-      "observability_helmChart": {
-        "name": "aio-observability",
-        "properties": {
-          "chart": {
-            "repo": "mcr.microsoft.com/azureiotoperations/helm/aio-opentelemetry-collector",
-            "version": "[variables('VERSIONS').observability]"
-          },
-          "values": {
-            "config": {
-              "exporters": {
-                "prometheus": {
-                  "endpoint": ":8889",
-                  "resource_to_telemetry_conversion": {
-                    "enabled": true
-                  }
-                }
-              },
-              "extensions": {
-                "memory_ballast": {
-                  "size_mib": 0
-                }
-              },
-              "processors": {
-                "memory_limiter": {
-                  "check_interval": "60s",
-                  "limit_percentage": 80,
-                  "spike_limit_percentage": 10
-                }
-              },
-              "receivers": {
-                "jaeger": null,
-                "otlp": {
-                  "protocols": {
-                    "grpc": {
-                      "endpoint": ":4317"
-                    },
-                    "http": {
-                      "endpoint": ":4318"
-                    }
-                  }
-                },
-                "prometheus": null,
-                "zipkin": null
-              },
-              "service": {
-                "extensions": [
-                  "health_check"
-                ],
-                "pipelines": {
-                  "logs": null,
-                  "metrics": {
-                    "exporters": [
-                      "prometheus"
+                      {
+                        "name": "AKRI_AGENT_REGISTRATION",
+                        "value": "true"
+                      }
                     ],
-                    "receivers": [
-                      "otlp"
+                    "image": "[format('{0}/opcuabroker/discovery-handler:{1}.4', variables('CONTAINER_REGISTRY_DOMAINS').opcUaBroker, variables('VERSIONS').opcUaBroker)]",
+                    "imagePullPolicy": "Always",
+                    "name": "aio-opc-asset-discovery",
+                    "ports": [
+                      {
+                        "containerPort": 80,
+                        "name": "discovery"
+                      }
+                    ],
+                    "resources": {
+                      "limits": {
+                        "cpu": "100m",
+                        "memory": "300Mi"
+                      },
+                      "requests": {
+                        "cpu": "10m",
+                        "memory": "64Mi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/var/lib/akri",
+                        "name": "discovery-handlers"
+                      }
                     ]
-                  },
-                  "traces": null
-                },
-                "telemetry": null
-              }
-            },
-            "fullnameOverride": "aio-otel-collector",
-            "mode": "deployment",
-            "ports": {
-              "jaeger-compact": {
-                "enabled": false
-              },
-              "jaeger-grpc": {
-                "enabled": false
-              },
-              "jaeger-thrift": {
-                "enabled": false
-              },
-              "metrics": {
-                "containerPort": 8889,
-                "enabled": true,
-                "protocol": "TCP",
-                "servicePort": 8889
-              },
-              "zipkin": {
-                "enabled": false
-              }
-            },
-            "resources": {
-              "limits": {
-                "cpu": "100m",
-                "memory": "512Mi"
+                  }
+                ],
+                "volumes": [
+                  {
+                    "hostPath": {
+                      "path": "/var/lib/akri"
+                    },
+                    "name": "discovery-handlers"
+                  }
+                ]
               }
             }
           }
-        },
-        "type": "helm.v3"
+        }
       },
-      "opc_ua_broker_helmChart": {
-        "name": "opc-ua-broker",
-        "properties": {
-          "chart": {
-            "repo": "[format('oci://{0}/opcuabroker/helmchart/microsoft-iotoperations-opcuabroker', variables('CONTAINER_REGISTRY_DOMAINS').opcUaBroker)]",
-            "version": "[variables('VERSIONS').opcUaBroker]"
+      "type": "yaml.k8s"
+    },
+    "asset_configuration": {
+      "name": "akri-opcua-asset",
+      "properties": {
+        "resource": {
+          "apiVersion": "akri.sh/v0",
+          "kind": "Configuration",
+          "metadata": {
+            "name": "akri-opcua-asset"
           },
-          "values": {
-            "mqttBroker": {
-              "address": "[variables('MQ_PROPERTIES').localUrl]",
-              "authenticationMethod": "serviceAccountToken",
-              "caCertConfigMapRef": "[variables('AIO_TRUST_CONFIG_MAP')]",
-              "caCertKey": "[variables('AIO_TRUST_CONFIG_MAP_KEY')]",
-              "connectUserProperties": {
-                "metriccategory": "aio-opc"
-              },
-              "serviceAccountTokenAudience": "[variables('MQ_PROPERTIES').satAudience]"
-            },
-            "opcPlcSimulation": {
-              "deploy": "[parameters('simulatePLC')]"
-            },
-            "openTelemetry": {
-              "enabled": true,
-              "endpoints": {
-                "default": {
-                  "emitLogs": true,
-                  "emitMetrics": true,
-                  "emitTraces": true,          
-                  "assetTraceSamplingProbability": 0.001,
-                  "protocol": "grpc",
-                  "uri": "[variables('OBSERVABILITY').otelCollectorAddress]"
-                },
-                "geneva": {
-                  "emitLogs": false,
-                  "emitMetrics": true,
-                  "emitTraces": false,
-                  "protocol": "grpc",
-                  "temporalityPreference": "delta",
-                  "uri": "[variables('OBSERVABILITY').genevaCollectorAddress]"
+          "spec": {
+            "brokerProperties": {},
+            "capacity": 1,
+            "discoveryHandler": {
+              "discoveryDetails": "[variables('akri').opcUaDiscoveryDetails]",
+              "name": "opcua-asset"
+            }
+          }
+        }
+      },
+      "type": "yaml.k8s"
+    },
+    "broker_fe_issuer_configuration": {
+      "name": "mq-fe-issuer-configuration",
+      "properties": {
+        "resource": {
+          "apiVersion": "cert-manager.io/v1",
+          "kind": "Issuer",
+          "metadata": {
+            "name": "[parameters('mqFrontendServer')]"
+          },
+          "spec": {
+            "ca": {
+              "secretName": "[variables('AIO_TRUST_SECRET_NAME')]"
+            }
+          }
+        }
+      },
+      "type": "yaml.k8s"
+    },
+    "observability_helmChart": {
+      "name": "aio-observability",
+      "properties": {
+        "chart": {
+          "repo": "mcr.microsoft.com/azureiotoperations/helm/aio-opentelemetry-collector",
+          "version": "[variables('VERSIONS').observability]"
+        },
+        "values": {
+          "config": {
+            "exporters": {
+              "prometheus": {
+                "endpoint": ":8889",
+                "resource_to_telemetry_conversion": {
+                  "enabled": true
                 }
               }
             },
-            "secrets": {
-              "csiDriver": "secrets-store.csi.k8s.io",
-              "csiServicePrincipalSecretRef": "[parameters('opcUaBrokerSecrets').csiServicePrincipalSecretRef]",
-              "kind": "[parameters('opcUaBrokerSecrets').kind]"
+            "extensions": {
+              "memory_ballast": {
+                "size_mib": 0
+              }
+            },
+            "processors": {
+              "memory_limiter": {
+                "check_interval": "60s",
+                "limit_percentage": 80,
+                "spike_limit_percentage": 10
+              }
+            },
+            "receivers": {
+              "jaeger": null,
+              "otlp": {
+                "protocols": {
+                  "grpc": {
+                    "endpoint": ":4317"
+                  },
+                  "http": {
+                    "endpoint": ":4318"
+                  }
+                }
+              },
+              "prometheus": null,
+              "zipkin": null
+            },
+            "service": {
+              "extensions": [
+                "health_check"
+              ],
+              "pipelines": {
+                "logs": null,
+                "metrics": {
+                  "exporters": [
+                    "prometheus"
+                  ],
+                  "receivers": [
+                    "otlp"
+                  ]
+                },
+                "traces": null
+              },
+              "telemetry": null
+            }
+          },
+          "fullnameOverride": "aio-otel-collector",
+          "mode": "deployment",
+          "ports": {
+            "jaeger-compact": {
+              "enabled": false
+            },
+            "jaeger-grpc": {
+              "enabled": false
+            },
+            "jaeger-thrift": {
+              "enabled": false
+            },
+            "metrics": {
+              "containerPort": 8889,
+              "enabled": true,
+              "protocol": "TCP",
+              "servicePort": 8889
+            },
+            "zipkin": {
+              "enabled": false
+            }
+          },
+          "resources": {
+            "limits": {
+              "cpu": "100m",
+              "memory": "512Mi"
             }
           }
-        },
-        "type": "helm.v3"
-      }
+        }
+      },
+      "type": "helm.v3"
     }
   }
-  
+}

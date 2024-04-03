@@ -30,7 +30,7 @@ resource opc_ua_connector_0 'microsoft.deviceregistry/assetendpointprofiles@2023
     userAuthentication: {
       mode: 'Anonymous'
     }
-    additionalConfiguration: '{"applicationName": "opc-ua-connector", "security": { "autoAcceptUntrustedServerCertificates": true}}'
+    additionalConfiguration: '{"applicationName": "opc-ua-connector-0", "security": { "autoAcceptUntrustedServerCertificates": true}}'
   }
   dependsOn: [
     deviceRegistry_extension
