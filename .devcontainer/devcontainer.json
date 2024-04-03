@@ -47,7 +47,8 @@
 				"ms-dotnettools.csdevkit",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"EditorConfig.EditorConfig",
-				"ms-vscode.powershell"
+				"ms-vscode.powershell",
+				"ms-azuretools.vscode-bicep"
 			]
 		}
 	}
