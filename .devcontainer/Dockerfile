@@ -16,9 +16,5 @@ RUN wget https://github.com/EdJoPaTo/mqttui/releases/download/v0.19.0/mqttui-v0.
     sudo apt-get install ./mqttui-v0.19.0-x86_64-unknown-linux-gnu.deb && \
     rm -rf ./mqttui-v0.19.0-x86_64-unknown-linux-gnu.deb
 
-# Install cmctl - cert-manager's CLI
-RUN cd /usr/bin && \
-    curl -fsSL https://github.com/cert-manager/cert-manager/releases/latest/download/cmctl-linux-amd64.tar.gz | tar xzv --no-anchored cmctl
-
 # Install Flux CLI
 RUN curl -s https://fluxcd.io/install.sh | FLUX_VERSION=2.0.0 bash
