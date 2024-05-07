@@ -46,7 +46,6 @@ az k8s-extension update --cluster-name $CLUSTER_NAME --resource-group $RESOURCE_
 echo "Installing Azure IoT Operations Preview components using ARM template to customize some settings"
 echo "Settings include:"
 echo "- MQ adding the property 'openTelemetryTracesCollectorAddr'"
-echo "- OPC UA Broker extension setting 'opcPlcSimulation.autoAcceptUntrustedCertificates' property to true for testing"
 echo "- Removed the deployment of Otel Collector in default template, will do this in step 4"
 # Removed the "[variables('observability_helmChart')]" from the target '[parameters('targetName')]'"
 az deployment group create \
