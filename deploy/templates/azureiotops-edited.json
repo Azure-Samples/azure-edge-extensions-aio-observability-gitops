@@ -643,7 +643,6 @@
       "name": "[parameters('targetName')]",
       "properties": {
         "components": [
-          "[variables('observability_helmChart')]",
           "[variables('akri_daemonset')]",
           "[variables('asset_configuration')]",
           "[variables('broker_fe_issuer_configuration')]"
