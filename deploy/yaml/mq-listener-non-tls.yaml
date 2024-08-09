@@ -1,12 +1,12 @@
-apiVersion: mq.iotoperations.azure.com/v1beta1
+apiVersion: mqttbroker.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
   name: dev-az-mqtt-non-tls-listener
   namespace: azure-iot-operations
 spec:
   brokerRef: broker
-  authenticationEnabled: false
-  authorizationEnabled: false
-  port: 1883
   serviceType: loadBalancer
   serviceName: dev-aio-mq-non-tls
+  ports:
+  - port: 1883
+    protocol: Mqtt

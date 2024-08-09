@@ -23,6 +23,18 @@ fi
 scriptPath=$(dirname $0)
 random=$RANDOM
 deploymentName="deployment-$random"
+cli_pinned_version="0.6.0b1"
+
+# AIO Preview update
+# Check az iot ops extension version and upgrade to version as pinned $cli_pinned_version
+installed_version=$(az extension show --name azure-iot-ops --query version -o tsv)
+if [ -z "$installed_version" ] || [ "$installed_version" != "$cli_pinned_version" ]; then
+    echo "Azure IoT Operations Preview extension is not installed or not the required version ($cli_pinned_version) - removing and installing"
+    az extension remove --name azure-iot-ops
+    az extension add --name azure-iot-ops --version "$cli_pinned_version"
+else
+    echo "Azure IoT Operations Preview extension is installed with version $cli_pinned_version"
+fi
 
 # Create Key Vault
 echo "Create Key Vault"
@@ -36,16 +48,9 @@ az iot ops init --cluster $CLUSTER_NAME -g $RESOURCE_GROUP  \
   --kv-id $keyVaultResourceId \
   --no-deploy
 
-# Updating the AKS CSI Driver post-install - this is a workaround to disable a resource intense monitoring Pod
-echo "Updating the AKS CSI Driver post-install"
-az k8s-extension update --cluster-name $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
-    --cluster-type connectedClusters \
-    --name akvsecretsprovider \
-    --configuration-settings arc.enableMonitoring=false --yes
-
 echo "Installing Azure IoT Operations Preview components using ARM template to customize some settings"
 echo "Settings include:"
-echo "- MQ adding the property 'openTelemetryTracesCollectorAddr'"
+echo "- OPCUA - set to true "connectors.opcua.values.openTelemetry.endpoints.default.emitLogs": "true", "
 echo "- Removed the deployment of Otel Collector in default template, will do this in step 4"
 # Removed the "[variables('observability_helmChart')]" from the target '[parameters('targetName')]'"
 az deployment group create \
@@ -60,8 +65,10 @@ az deployment group create \
     --no-prompt
 
 # Add a Developer endpoint non TLS for MQ - local testing
+# Never do the below in production!!
 echo "Local dev - adding a non-TLS BrokerListener for port 1883"
 kubectl apply -f $scriptPath/yaml/mq-listener-non-tls.yaml 
+# Never do the above in production!!
 
 # Check Broker is running - when using CLI to deploy AIO, the broker is named 'broker'
 status=$(kubectl get broker broker -n $DEFAULT_NAMESPACE -o json | jq '.status.status')

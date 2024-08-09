@@ -8,17 +8,8 @@ The objective is to illustrate how to setup observability to be able to locally 
 
 If you’re looking for a default observability setup and wish to analyze observability data using Azure Monitor, follow [this documentation](https://learn.microsoft.com/en-us/azure/iot-operations/monitor/howto-configure-observability).
 
-
 > [!WARNING]
-Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability.
-
-<!-- ## Features (TODO to come later)
-
-This project framework provides the following features:
-
-* Feature 1
-* Feature 2
-* ... -->
+Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability. The current version is pinned in the dev container, and is Azure IoT Operations Preview v0.6.0.
 
 ## Getting Started
 
@@ -88,7 +79,7 @@ code ./temp/envvars.sh
 Enable the local K3D cluster to Azure Arc and install Azure IoT Operations with the default components and configuration.
 
 1. In a `bash` terminal, run the script script `./deploy/1-arc-k8s-connect.sh` to connect the K3D cluster to Azure Arc. This will take a few minutes.
-1. Run the script `./deploy/2-azure-iot-operations.sh`. Grab a coffee, this can take 15 minutes.
+1. Run the script `./deploy/2-azure-iot-operations.sh`. Grab a coffee, this can take 15 minutes. This script installs Azure IoT Operations and adds a developer-only mode, non-TLS enabled MQ Broker listener so you can debug messages without setting up TLS from the local machine to the local cluster. This setting is for the developer inner loop and not to be done in production.
 1. Validate the installation finished correctly by running `mqttui` in the terminal. You should see messages being published in the topic `azure-iot-operations`.
 1. Run the script `./deploy/3-flux-install.sh` to create a [Flux](https://fluxcd.io/flux/) configuration.
 1. Run the script `./deploy/4-otel-collector-update.sh` to update aio-otel-collector to export observability data to local edge observability components.
