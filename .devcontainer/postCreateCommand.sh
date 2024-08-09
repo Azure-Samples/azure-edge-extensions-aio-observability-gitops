@@ -6,10 +6,6 @@ set -o pipefail
 
 echo "Starting Post Create Command"
 
-# This env var is important to allow k3s to support shared mounts, required for CSI driver
-# Temporary fix until made default https://github.com/k3d-io/k3d/pull/1268#issuecomment-1745466499
-export K3D_FIX_MOUNTS=1
-
 # Create local registry for K3D and local development
 if [[ $(docker ps -f name=k3d-devregistry.localhost -q) ]]; then
     echo "Registry already exists so this is a rebuild of Dev Container, skipping"
