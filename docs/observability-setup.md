@@ -10,7 +10,7 @@
 
 ## Context
 
-Current Azure IoT Operations preview template deploys the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) which is responsible for collecting metrics, traces, and logs from various components.
+Current [observability documentation](https://learn.microsoft.com/azure/iot-operations/configure-observability-monitoring/howto-configure-observability) for Azure IoT Operations Preview explains how to deploy the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) which is responsible for collecting metrics, traces, and logs from various components.
 
 In this repository we demonstrate:
 
@@ -29,14 +29,15 @@ The local edge observability stack is composed of the following components:
 These components are deployed to the cluster using a GitOps approach through Flux. The `app` folder contains [edge-observability](./apps/edge-observability/) directory where all components are configured. This is achieved by specifying a Helm repository and then configuring a Helm release for each component with the minimal required setup.
 
 The Prometheus Helm chart deploys the Prometheus server, the Grafana Loki Helm chart deploys Loki, and the Grafana Tempo Helm chart deploys Tempo. The Grafana Helm chart configures data sources to visualize data from Prometheus, Loki, and Tempo. It also deploys a set of dashboards, which include:
-* custom dashboards located in the [grafana-dashboards](/apps/edge-observability/1.0/grafana-dashboards/) folder. These were created based on the provided [sample dashboards](https://github.com/Azure/azure-iot-operations/tree/main/samples/grafana-dashboards),
-* dashboards imported from grafana.com, such as the [OpenTelemetry Collector](https://grafana.com/dashboards/15983) and [Otel - kubeletstats](https://grafana.com/dashboards/18681) dashboards.
+
+- Custom dashboards located in the [grafana-dashboards](/apps/edge-observability/1.0/grafana-dashboards/) folder. These were created based on the provided [sample dashboards](https://github.com/Azure/azure-iot-operations/tree/main/samples/grafana-dashboards).
+- Dashboards imported from grafana.com, such as the [OpenTelemetry Collector](https://grafana.com/dashboards/15983) and [Otel - kubeletstats](https://grafana.com/dashboards/18681) dashboards.
 
 All pods are deployed to the `edge-observability` namespace, so you can view them by running:
 
-```bash
-kubectl get pods -n edge-observability
-```
+   ```bash
+   kubectl get pods -n edge-observability
+   ```
 
 ## OpenTelemetry collector configuration
 
@@ -44,7 +45,7 @@ The OpenTelemetry Collector Helm chart is deployed via the Azure IoT Orchestrato
 
 In the default configuration, the collected metrics are exposed by the collector on port 8889. To view them, run the command `kubectl port-forward svc/aio-otel-collector 8889:8889 -n azure-iot-operations` and then access http://localhost:8889/metrics. Additionally, logs and traces are logged to the console output of the collector.
 
-The OpenTelemetry Collector is highly configurable, allowing for the definition of multiple receivers, processors, and exporters. Based on [this documentation](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-custom/howto-helm#deploy-a-helm-chart-with-override-values), [a Bicep script](../deploy/templates/aio-otel-collector-update.bicep) was created to override the base values with the following [overlay values](../deploy/templates/aio-otel-collector-overlay-values.yml).
+The OpenTelemetry Collector is highly configurable, allowing for the definition of multiple receivers, processors, and exporters. Based on [this documentation](https://learn.microsoft.com/azure/iot-operations/deploy-custom/howto-helm#deploy-a-helm-chart-with-override-values), [a Bicep script](../deploy/templates/aio-otel-collector-update.bicep) was created to override the base values with the following [overlay values](../deploy/templates/aio-otel-collector-overlay-values.yml).
 
 The overlay values include the addition of the following components:
 
