@@ -2,6 +2,7 @@ resources:
   - ./namespace.yaml
   - ./prometheus-helm.yaml
   - ./grafana-helm.yaml
+  - ./otel-collector-helm.yaml
 
 configMapGenerator:
   - name: custom-grafana-dashboards

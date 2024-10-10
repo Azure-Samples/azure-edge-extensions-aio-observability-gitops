@@ -44,7 +44,10 @@ az iot ops schema registry create --name $SCHEMA_REGISTRY --resource-group $RESO
 
 # Initialize Azure IoT Operations
 echo "Running Azure IoT Operations initialization"
-az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --sr-resource-id $(az iot ops schema registry show --name $SCHEMA_REGISTRY --resource-group $RESOURCE_GROUP -o tsv --query id)
+az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
+    --sr-resource-id $(az iot ops schema registry show --name $SCHEMA_REGISTRY --resource-group $RESOURCE_GROUP -o tsv --query id) \
+    --ops-config observability.metrics.openTelemetryCollectorAddress=otel-collector.edge-observability.svc.cluster.local:4317 \
+    --ops-config observability.metrics.exportInternalSeconds=60
 
 # Deploy instance # TODO see tls-listener insecure + resource sync disabled
 echo "Running Azure IoT Operations instance creation"
@@ -54,59 +57,28 @@ az iot ops create --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --nam
 echo "Deploying OPC PLC Simulator"
 kubectl apply -f https://raw.githubusercontent.com/Azure-Samples/explore-iot-operations/main/samples/quickstarts/opc-plc-deployment.yaml
 
-# Create Key Vault
-# echo "Create Key Vault"
-# az keyvault create -n $AKV_NAME -g $RESOURCE_GROUP --enable-rbac-authorization false
-# keyVaultResourceId=$(az keyvault show -n $AKV_NAME -g $RESOURCE_GROUP -o tsv --query id)
-
-# # Initialize Azure IoT Operations Preview Pre-requisites
-# # This will install Azure Arc Extension CSI Driver, configure TLS and some Secrets and ConfigMaps
-# echo "Initializing Azure IoT Operations pre-requisites with the Azure IoT CLI extension"
-# az iot ops init --cluster $CLUSTER_NAME -g $RESOURCE_GROUP  \
-#   --kv-id $keyVaultResourceId \
-#   --no-deploy
-
-# echo "Installing Azure IoT Operations Preview components using ARM template to customize some settings"
-# echo "Settings include:"
-# echo "- OPCUA - set to true "connectors.opcua.values.openTelemetry.endpoints.default.emitLogs": "true", "
-# echo "- Removed the deployment of Otel Collector in default template, will do this in step 4"
-# # Removed the "[variables('observability_helmChart')]" from the target '[parameters('targetName')]'"
-# az deployment group create \
-#     --resource-group $RESOURCE_GROUP \
-#     --name aio-$deploymentName \
-#     --template-file "$scriptPath/templates/azureiotops-edited.json" \
-#     --parameters clusterName=$CLUSTER_NAME \
-#     --parameters location=$LOCATION \
-#     --parameters clusterLocation=$LOCATION \
-#     --parameters deployResourceSyncRules=true \
-#     --parameters simulatePLC=true \
-#     --no-prompt
-
-# Add a Developer endpoint non TLS for MQ - local testing
-# # Never do the below in production!!
-# echo "Local dev - adding a non-TLS BrokerListener for port 1883"
-# kubectl apply -f $scriptPath/yaml/mq-listener-non-tls.yaml 
-# Never do the above in production!!
-
-# Check Broker is running - when using CLI to deploy AIO, the broker is named 'broker'
-status=$(kubectl get broker broker -n $DEFAULT_NAMESPACE -o json | jq '.status.status')
+# Check Broker is running - when using CLI to deploy AIO, the broker is named 'default'
+status=$(kubectl get broker default -n $DEFAULT_NAMESPACE -o json | jq '.status.runtimeStatus.status')
 while [ "$status" != "\"Running\"" ]
 do
     echo "Waiting for MQ broker to be running"
     sleep 5
-    status=$(kubectl get broker broker -n $DEFAULT_NAMESPACE -o json | jq '.status.status')
+    status=$(kubectl get broker default -n $DEFAULT_NAMESPACE -o json | jq '.status.runtimeStatus.status')
 done
 
 echo "MQ Broker is now running"
 
 # OPC AssetEndpointProfile and Assets with a Bicep template
 echo "Deploying OPC AssetEndpointProfile and Asset using Bicep"
+custom_location_name=$(az customlocation list --resource-group $RESOURCE_GROUP --query "[?contains(name, 'location-')].[name]" -o tsv)
+
 az deployment group create \
     --resource-group $RESOURCE_GROUP \
     --name assets-$deploymentName \
     --template-file "$scriptPath/templates/assets-endpoint.bicep" \
     --parameters clusterName=$CLUSTER_NAME \
     --parameters location=$LOCATION \
+    --parameters customLocationName=$custom_location_name \
     --no-prompt
 
 echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"

@@ -11,7 +11,7 @@
 	"features": {
 		"ghcr.io/devcontainers/features/azure-cli:1": {
 			"version": "2.64.0",
-			"extensions": "connectedk8s,k8s-extension,azure-iot-ops,k8s-configuration"
+			"extensions": "connectedk8s,k8s-extension,azure-iot-ops,k8s-configuration,customlocation"
 		},
 		"ghcr.io/rio/features/k3d:1": {},
 		"ghcr.io/rio/features/k9s:1.1.5": {},
