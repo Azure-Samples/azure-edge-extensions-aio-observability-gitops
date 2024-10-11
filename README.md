@@ -16,7 +16,7 @@ If you’re looking for a default observability setup and wish to analyze observ
 ### Prerequisites
 
 * Visual Studio Code installed on your development machine. For more information, see [Download Visual Studio Code](https://code.visualstudio.com/download).
-* Dev Containers support in Visual Studio Code.
+* Dev Containers support in Visual Studio Code, or use Codespaces.
 * An Azure subscription. If you don't have an Azure subscription, [create one for free](https://azure.microsoft.com/free/) before you begin.
 * Azure subscription RBAC permissions: either Contributor role, or if using an existing resource group, use an identity that has **Microsoft/Authorization/roleAssignments/write**. permissions at the resource group level.
 * [Docker](https://docs.docker.com/engine/install/) runtime.

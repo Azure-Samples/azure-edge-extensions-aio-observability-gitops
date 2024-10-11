@@ -18,8 +18,8 @@ spec:
   targetNamespace: edge-observability
   chart:
     spec:
-      chart: open-telemetry/opentelemetry-collector
-      version: 0.107.0
+      chart: opentelemetry-collector
+      version: 0.108.0
       interval: 6h
       sourceRef:
         kind: HelmRepository
