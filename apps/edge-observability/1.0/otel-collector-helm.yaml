@@ -48,9 +48,9 @@ spec:
         otlp:
           protocols:
             grpc:
-              endpoint: ':4317'
+              endpoint: ${env:MY_POD_IP}:4317
             http:
-              endpoint: ':4318'
+              endpoint: ${env:MY_POD_IP}:4318
         k8s_cluster:
           collection_interval: 1m # default is 10s
         kubeletstats:
@@ -64,40 +64,37 @@ spec:
                 static_configs:
                 - targets:
                   - ${env:MY_POD_IP}:8888
-              - job_name: otel
-            scrape_interval: 1m
-            static_configs:
-              - targets:
-                - aio-internal-diagnostics-service.azure-iot-operations.svc.cluster.local:9600
-              # - targets:
-              #   - aio-otel-collector.azure-iot-operations.svc.cluster.local:8889
+              - job_name: "mq-broker"
+                static_configs:
+                  - targets:
+                      - aio-mq-diagnostics-service.azure-iot-operations.svc.cluster.local:9600
               - job_name: aio-annotated-pod-metrics
                 kubernetes_sd_configs:
                 - role: pod
-                  relabel_configs:
-                  - action: drop
-                    regex: true
-                    source_labels:
-                    - __meta_kubernetes_pod_container_init
-                  - action: keep
-                    regex: true
-                    source_labels:
-                    - __meta_kubernetes_pod_annotation_prometheus_io_scrape
-                  - action: replace
-                    regex: ([^:]+)(?::\\d+)?;(\\d+)
-                    replacement: $1:$2
-                    source_labels:
-                    - __address__
-                    - __meta_kubernetes_pod_annotation_prometheus_io_port
-                    target_label: __address__
-                  - action: replace
-                    source_labels:
-                    - __meta_kubernetes_namespace
-                    target_label: kubernetes_namespace
-                  - action: keep
-                    regex: 'azure-iot-operations'
-                    source_labels:
-                    - kubernetes_namespace
+                relabel_configs:
+                - action: drop
+                  regex: true
+                  source_labels:
+                  - __meta_kubernetes_pod_container_init
+                - action: keep
+                  regex: true
+                  source_labels:
+                  - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+                - action: replace
+                  regex: ([^:]+)(?::\\d+)?;(\\d+)
+                  replacement: $1:$2
+                  source_labels:
+                  - __address__
+                  - __meta_kubernetes_pod_annotation_prometheus_io_port
+                  target_label: __address__
+                - action: replace
+                  source_labels:
+                  - __meta_kubernetes_namespace
+                  target_label: kubernetes_namespace
+                - action: keep
+                  regex: 'azure-iot-operations'
+                  source_labels:
+                  - kubernetes_namespace
       exporters:
         prometheus:
           endpoint: ':8889'
@@ -121,16 +118,17 @@ spec:
             - key: deployment.environment
               value: DEV
               action: insert
+        batch: {}
         memory_limiter:
           limit_percentage: 80
           spike_limit_percentage: 10
           check_interval: '60s'
-      extensions:
-        memory_ballast:
-          size_mib: 0
       service:
         extensions:
           - health_check
+        telemetry:
+          metrics:
+            address: ${env:MY_POD_IP}:8888
         pipelines:
           logs:
             processors:
@@ -165,18 +163,17 @@ spec:
             exporters:
               - otlp/tempo
               - debug
-      ports:
-        jaeger-compact:
-          enabled: false
-        jaeger-grpc:
-          enabled: false
-        jaeger-thrift:
-          enabled: false
-        metrics:
-          enabled: true
-          containerPort: 8889
-          servicePort: 8889
-          protocol: 'TCP'
-        zipkin:
-          enabled: false
-    
+    ports:
+      jaeger-compact:
+        enabled: false
+      jaeger-grpc:
+        enabled: false
+      jaeger-thrift:
+        enabled: false
+      metrics:
+        enabled: true
+        containerPort: 8889
+        servicePort: 8889
+        protocol: 'TCP'
+      zipkin:
+        enabled: false
