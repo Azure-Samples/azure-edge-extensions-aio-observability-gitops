@@ -46,7 +46,7 @@ az iot ops schema registry create --name $SCHEMA_REGISTRY --resource-group $RESO
 echo "Running Azure IoT Operations initialization"
 az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
     --sr-resource-id $(az iot ops schema registry show --name $SCHEMA_REGISTRY --resource-group $RESOURCE_GROUP -o tsv --query id) \
-    --ops-config observability.metrics.openTelemetryCollectorAddress=otel-collector.edge-observability.svc.cluster.local:4317 \
+    --ops-config observability.metrics.openTelemetryCollectorAddress=otel-collector.opentelemetry.svc.cluster.local:4317 \
     --ops-config observability.metrics.exportInternalSeconds=60
 
 # Deploy instance # TODO see tls-listener insecure + resource sync disabled

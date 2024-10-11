@@ -1,0 +1,15 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: otelcollector
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: gitops-repo
+    namespace: flux-system
+  path: ./clusters/dev/sets/opentelemetry
+  prune: true
+  wait: true
+  timeout: 10m
