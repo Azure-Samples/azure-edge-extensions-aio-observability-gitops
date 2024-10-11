@@ -36,8 +36,6 @@ spec:
       enabled: false
     prometheus-pushgateway:
       enabled: false
-    # extraArgs: TODO remove
-    #   web.enable-remote-write-receiver: null
     server:
       persistentVolume:
         size: 256Mi

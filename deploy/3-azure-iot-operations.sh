@@ -49,11 +49,11 @@ az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
     --ops-config observability.metrics.openTelemetryCollectorAddress=otel-collector.opentelemetry.svc.cluster.local:4317 \
     --ops-config observability.metrics.exportInternalSeconds=60
 
-# Deploy instance # TODO see tls-listener insecure + resource sync disabled
+# Deploy instance
 echo "Running Azure IoT Operations instance creation"
 az iot ops create --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
-    --name ${CLUSTER_NAME}-instance
-    # --broker-config-file "$scriptPath/templates/broker-config.json"
+    --name ${CLUSTER_NAME}-instance \
+    --add-insecure-listener
 
 # Deploy OPC PLC simulator (Note this can move to FLUX based setup once GA, but skip for this Preview version)
 echo "Deploying OPC PLC Simulator"
