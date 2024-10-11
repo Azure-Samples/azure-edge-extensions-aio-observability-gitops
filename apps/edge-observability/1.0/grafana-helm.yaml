@@ -1,4 +1,4 @@
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: grafana
@@ -8,7 +8,7 @@ spec:
   url: https://grafana.github.io/helm-charts
 
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: grafana
@@ -85,7 +85,7 @@ spec:
         memory: 150Mi
 
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: grafana-tempo
@@ -177,7 +177,7 @@ spec:
                     per_tenant_override_config: /conf/overrides.yaml
 
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: grafana-loki
