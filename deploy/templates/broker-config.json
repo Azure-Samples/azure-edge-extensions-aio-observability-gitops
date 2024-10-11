@@ -15,10 +15,7 @@
    },
    "diagnostics": {
      "logs": {
-       "level": "info",
-       "opentelemetryExportConfig": {
-         "otlpGrpcEndpoint": "otel-collector.edge-observability.svc.cluster.local:4317"
-      }
+       "level": "info"
      },
      "metrics": {
        "prometheusPort": 9600
@@ -41,5 +38,5 @@
    "generateResourceLimits": {
      "cpu": "Disabled"
    },
-   "memoryProfile": "Medium",
+   "memoryProfile": "Medium"
 }
