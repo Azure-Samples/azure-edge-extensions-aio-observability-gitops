@@ -41,8 +41,8 @@ spec:
       clusterMetrics:
         enabled: true
     image:
-      repository: otel/opentelemetry-collector
-      tag: 0.107.0
+      repository: otel/opentelemetry-collector-contrib
+      tag: 0.108.0
     config:
       receivers:
         otlp:
