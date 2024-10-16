@@ -64,10 +64,6 @@ spec:
                 static_configs:
                 - targets:
                   - ${env:MY_POD_IP}:8888
-              # - job_name: "mq-broker" # TODO validate this should now be supported through AIO generic setting
-              #   static_configs:
-              #     - targets:
-              #         - aio-mq-diagnostics-service.azure-iot-operations.svc.cluster.local:9600
               - job_name: aio-annotated-pod-metrics
                 kubernetes_sd_configs:
                 - role: pod

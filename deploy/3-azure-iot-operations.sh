@@ -53,6 +53,7 @@ az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
 echo "Running Azure IoT Operations instance creation"
 az iot ops create --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
     --name ${CLUSTER_NAME}-instance \
+    --broker-config-file "$scriptPath/templates/broker-config.json" \
     --add-insecure-listener
 
 # Deploy OPC PLC simulator (Note this can move to FLUX based setup once GA, but skip for this Preview version)
@@ -82,5 +83,12 @@ az deployment group create \
     --parameters location=$LOCATION \
     --parameters customLocationName=$custom_location_name \
     --no-prompt
+
+# Temporary hack to set Tracing and Logs to true in OPC UA Supervisor in v0.7.x-preview
+echo "Patching OPC UA Supervisor to emit Traces and Logs"
+# opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitLogs
+kubectl patch deployment aio-opc-supervisor -n azure-iot-operations --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/env/57/value", "value": "true"}]'
+# opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitTraces
+kubectl patch deployment aio-opc-supervisor -n azure-iot-operations --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/env/59/value", "value": "true"}]'
 
 echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
