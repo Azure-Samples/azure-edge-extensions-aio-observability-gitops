@@ -86,9 +86,8 @@ az deployment group create \
 
 # Temporary hack to set Tracing and Logs to true in OPC UA Supervisor in v0.7.x-preview
 echo "Patching OPC UA Supervisor to emit Traces and Logs"
-# opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitLogs
-kubectl patch deployment aio-opc-supervisor -n azure-iot-operations --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/env/57/value", "value": "true"}]'
-# opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitTraces
-kubectl patch deployment aio-opc-supervisor -n azure-iot-operations --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/env/59/value", "value": "true"}]'
+kubectl get deployment aio-opc-supervisor -n azure-iot-operations -o json > ./temp/aio-opc-supervisor.json
+jq '.spec.template.spec.containers[0].env |= map(if .name == "opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitLogs" then .value = "true" else . end) | .spec.template.spec.containers[0].env |= map(if .name == "opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitTraces" then .value = "true" else . end)' ./temp/aio-opc-supervisor.json > ./temp/aio-opc-supervisor-patched.json
+kubectl apply -f ./temp/aio-opc-supervisor-patched.json
 
 echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
