@@ -23,7 +23,7 @@ fi
 scriptPath=$(dirname $0)
 random=$RANDOM
 deploymentName="deployment-$random"
-cli_pinned_version="0.7.0b1"
+cli_pinned_version="0.8.0b1"
 
 # AIO Preview update
 # Check az iot ops extension version and upgrade to version as pinned $cli_pinned_version
@@ -44,17 +44,21 @@ az iot ops schema registry create --name $SCHEMA_REGISTRY --resource-group $RESO
 
 # Initialize Azure IoT Operations
 echo "Running Azure IoT Operations initialization"
-az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
-    --sr-resource-id $(az iot ops schema registry show --name $SCHEMA_REGISTRY --resource-group $RESOURCE_GROUP -o tsv --query id) \
-    --ops-config observability.metrics.openTelemetryCollectorAddress=otel-collector.opentelemetry.svc.cluster.local:4317 \
-    --ops-config observability.metrics.exportInternalSeconds=60
+az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP
 
 # Deploy instance
 echo "Running Azure IoT Operations instance creation"
 az iot ops create --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
     --name ${CLUSTER_NAME}-instance \
-    --broker-config-file "$scriptPath/templates/broker-config.json" \
-    --add-insecure-listener
+    --sr-resource-id $(az iot ops schema registry show --name $SCHEMA_REGISTRY --resource-group $RESOURCE_GROUP -o tsv --query id) \
+    --broker-frontend-replicas 1 --broker-frontend-workers 1  --broker-backend-part 1  --broker-backend-workers 1 --broker-backend-rf 2 --broker-mem-profile Low \
+    --ops-config observability.metrics.openTelemetryCollectorAddress=otel-collector.opentelemetry.svc.cluster.local:4317 \
+    --ops-config observability.metrics.exportInternalSeconds=60 \
+    --ops-config connectors.values.openTelemetry.endpoints.default.emitLogs=true \
+    --ops-config connectors.values.openTelemetry.endpoints.default.emitMetrics=true \
+    --ops-config connectors.values.openTelemetry.endpoints.default.emitTraces=true \
+    --ops-config connectors.values.openTelemetry.endpoints.default.protocol=grpc \
+    --ops-config connectors.values.openTelemetry.endpoints.default.uri=http://otel-collector.opentelemetry.svc.cluster.local:4317
 
 # Deploy OPC PLC simulator (Note this can move to FLUX based setup once GA, but skip for this Preview version)
 echo "Deploying OPC PLC Simulator"
@@ -83,11 +87,5 @@ az deployment group create \
     --parameters location=$LOCATION \
     --parameters customLocationName=$custom_location_name \
     --no-prompt
-
-# Temporary hack to set Tracing and Logs to true in OPC UA Supervisor in v0.7.x-preview
-echo "Patching OPC UA Supervisor to emit Traces and Logs"
-kubectl get deployment aio-opc-supervisor -n azure-iot-operations -o json > ./temp/aio-opc-supervisor.json
-jq '.spec.template.spec.containers[0].env |= map(if .name == "opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitLogs" then .value = "true" else . end) | .spec.template.spec.containers[0].env |= map(if .name == "opcuabroker_OpenTelemetry__Endpoints__3POtelEndpoint__EmitTraces" then .value = "true" else . end)' ./temp/aio-opc-supervisor.json > ./temp/aio-opc-supervisor-patched.json
-kubectl apply -f ./temp/aio-opc-supervisor-patched.json
 
 echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
