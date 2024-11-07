@@ -9,7 +9,7 @@ The objective is to illustrate how to setup observability to be able to locally 
 If you’re looking for a default observability setup and wish to analyze observability data using Azure Arc extensions and Azure Monitor in the cloud, follow [this documentation](https://learn.microsoft.com/en-us/azure/iot-operations/monitor/howto-configure-observability).
 
 > [!WARNING]
-> Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability. The current version is pinned in this dev container is Azure IoT Operations Preview v0.8.0.
+> Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability. The current version is pinned in this dev container is Azure IoT Operations Preview v0.8.32.
 
 ## Getting Started
 
