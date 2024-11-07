@@ -64,7 +64,7 @@ By using the Dev Container, a K3D cluster and any documented client tools will b
 
    ```
 
-1. The newly created file `./temp/envvars.sh` should now be open in the Code editor.
+1. The newly created file `./temp/envvars.sh` should now be opened in the Code editor.
 1. Update the variables in the file according to these details:
 
    1. For the resource names, use your preferred Azure resource names in the variable contents. An example using the recommended resource abbreviations provided in the comments

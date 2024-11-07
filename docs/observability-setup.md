@@ -14,10 +14,10 @@ Current [observability documentation](https://learn.microsoft.com/azure/iot-oper
 
 In this repository we demonstrate:
 
-* how to override the default configuration of the OpenTelemetry Collector
+* how to setup and configure the OpenTelemetry Collector through Flux
 * how to export observability telemetry data (including metrics, logs and traces) to an edge observability stack running locally.
 
-## Local egde observability stack
+## Local edge observability stack
 
 The local edge observability stack is composed of the following components:
 
@@ -41,13 +41,15 @@ All pods are deployed to the `edge-observability` namespace, so you can view the
 
 ## OpenTelemetry collector configuration
 
-The OpenTelemetry Collector Helm chart is deployed via the Azure IoT Orchestrator. The default Helm values can be found in either [the ARM template](../deploy/templates/azureiotops-edited.json) (under `observability_helmChart` variable) or [here](../deploy/templates/aio-otel-collector-base-values.yml).
+The OpenTelemetry Collector Helm chart is deployed through GitOps Flux configuration. This configuration is setup as a dependency to the previously installed local observability tools described above. The OpenTelemetry collector is deployed into the namespace `opentelemetry`. The collector is exposed through the service endpoint `otel-collector.opentelemetry.svc.cluster.local`.
+
+Installation of Azure IoT Operations is triggered after this release so that its components can reference the OpenTelemetry Collector endpoint as a destination for metrics. This is done by passing `--ops-config` arguments to the `az iot ops create` command.
 
 In the default configuration, the collected metrics are exposed by the collector on port 8889. To view them, run the command `kubectl port-forward svc/aio-otel-collector 8889:8889 -n azure-iot-operations` and then access http://localhost:8889/metrics. Additionally, logs and traces are logged to the console output of the collector.
 
-The OpenTelemetry Collector is highly configurable, allowing for the definition of multiple receivers, processors, and exporters. Based on [this documentation](https://learn.microsoft.com/azure/iot-operations/deploy-custom/howto-helm#deploy-a-helm-chart-with-override-values), [a Bicep script](../deploy/templates/aio-otel-collector-update.bicep) was created to override the base values with the following [overlay values](../deploy/templates/aio-otel-collector-overlay-values.yml).
+The OpenTelemetry Collector is highly configurable, allowing for the definition of multiple receivers, processors, and exporters.
 
-The overlay values include the addition of the following components:
+The configuration we use for this sample include:
 
 * exporters
   * [prometheusremotewrite](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/prometheusremotewriteexporter/README.md) that sends OpenTelemetry metrics to a locally running Prometheus server.
@@ -60,11 +62,6 @@ The overlay values include the addition of the following components:
 * receivers
   * [k8s_cluster](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/k8sclusterreceiver/README.md) that collects cluster-level metrics and entity events from the Kubernetes API server.
   * [kubeletstats](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver/README.md) that pulls node, pod, container, and volume metrics from the API server on a kubelet.
-
-Additionally
-
-* [prometheus](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver) receiver was updated to scrape MQ metrics.
-* opentelemetry-collector-contrib image was updated to version [0.95.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.95.0).
 
 The following diagram illustrates configured components and the flow of observability data:
 
@@ -140,7 +137,7 @@ If you wish to update an existing dashboard, simply make the necessary modificat
 * To check OpenTelemetry collector configuration, run
 
 ```bash
-kubectl describe configmap aio-otel-collector -n azure-iot-operations
+kubectl describe configmap otel-collector -n opentelemetry
 ```
 
 * To check if kustomizations were applied, run:
