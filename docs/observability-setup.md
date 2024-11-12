@@ -49,7 +49,7 @@ In the default configuration, the collected metrics are exposed by the collector
 
 The OpenTelemetry Collector is highly configurable, allowing for the definition of multiple receivers, processors, and exporters.
 
-The configuration we use for this sample include:
+The configuration used in this sample includes the following components:
 
 * exporters
   * [prometheusremotewrite](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/prometheusremotewriteexporter/README.md) that sends OpenTelemetry metrics to a locally running Prometheus server.
