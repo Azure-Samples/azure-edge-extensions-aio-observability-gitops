@@ -15,7 +15,7 @@
 		},
 		"ghcr.io/rio/features/k3d:1": {},
 		"ghcr.io/rio/features/k9s:1.1.5": {},
-		"ghcr.io/devcontainers/features/powershell:1.2": {}
+		"ghcr.io/devcontainers/features/powershell:1.5": {}
 		// add here any other features you want to install
 	},
 
