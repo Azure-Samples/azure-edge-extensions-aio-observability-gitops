@@ -30,6 +30,7 @@ az k8s-configuration flux create \
     --scope cluster \
     --url $GITOPS_SOURCE_REPO \
     --branch $GITOPS_BRANCH \
-    --kustomization name=bootstrap path=./clusters/dev/flux prune=true
+    --kustomization name=bootstrap path=./clusters/dev/flux/infra prune=true \
+    --kustomization name=otel path=./clusters/dev/flux/opentelemetry prune=true dependsOn=\["bootstrap"\]
 
 echo "Successfully applied flux configuration to cluster $CLUSTER_NAME"
