@@ -1,2 +1,3 @@
 resources:
   - ./edge-observability/1.0
+  - ./pc-plc-simulator/latest

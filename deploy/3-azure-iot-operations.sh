@@ -23,17 +23,17 @@ fi
 scriptPath=$(dirname $0)
 random=$RANDOM
 deploymentName="deployment-$random"
-cli_pinned_version="0.8.0b1"
+cli_pinned_version="1.0.0"
 
-# AIO Preview update
+# AIO Pin the version
 # Check az iot ops extension version and upgrade to version as pinned $cli_pinned_version
 installed_version=$(az extension show --name azure-iot-ops --query version -o tsv)
 if [ -z "$installed_version" ] || [ "$installed_version" != "$cli_pinned_version" ]; then
-    echo "Azure IoT Operations Preview extension is not installed or not the required version ($cli_pinned_version) - removing and installing"
+    echo "Azure IoT Operations extension is not installed or not the required version ($cli_pinned_version) - removing and installing"
     az extension remove --name azure-iot-ops
     az extension add --name azure-iot-ops --version "$cli_pinned_version"
 else
-    echo "Azure IoT Operations Preview extension is installed with version $cli_pinned_version"
+    echo "Azure IoT Operations extension is installed with version $cli_pinned_version"
 fi
 
 # Create Schema Registry and pre-requisites
@@ -60,10 +60,6 @@ az iot ops create --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP \
     --ops-config connectors.values.openTelemetry.endpoints.default.protocol=grpc \
     --ops-config connectors.values.openTelemetry.endpoints.default.uri=http://otel-collector.opentelemetry.svc.cluster.local:4317
 
-# Deploy OPC PLC simulator (Note this can move to FLUX based setup once GA, but skip for this Preview version)
-echo "Deploying OPC PLC Simulator"
-kubectl apply -f https://raw.githubusercontent.com/Azure-Samples/explore-iot-operations/main/samples/quickstarts/opc-plc-deployment.yaml
-
 # Check Broker is running - when using CLI to deploy AIO, the broker is named 'default'
 status=$(kubectl get broker default -n $DEFAULT_NAMESPACE -o json | jq '.status.runtimeStatus.status')
 while [ "$status" != "\"Running\"" ]
@@ -88,4 +84,4 @@ az deployment group create \
     --parameters customLocationName=$custom_location_name \
     --no-prompt
 
-echo "Finished deploying Azure IoT Operations Preview components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
+echo "Finished deploying Azure IoT Operations ${cli_pinned_version} components to cluster $CLUSTER_NAME in resource group $RESOURCE_GROUP"
