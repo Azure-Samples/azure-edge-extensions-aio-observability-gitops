@@ -71,6 +71,9 @@ done
 
 echo "MQ Broker is now running"
 
+# Deploy OPC PLC Simulator 
+kubectl apply -f "$scriptPath/yaml/opc-plc.yaml"
+
 # OPC AssetEndpointProfile and Assets with a Bicep template
 echo "Deploying OPC AssetEndpointProfile and Asset using Bicep"
 custom_location_name=$(az customlocation list --resource-group $RESOURCE_GROUP --query "[?contains(name, 'location-')].[name]" -o tsv)
