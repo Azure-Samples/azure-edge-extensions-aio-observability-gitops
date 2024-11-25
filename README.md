@@ -1,6 +1,4 @@
-# Sample with Azure IoT Operations Preview and Local Observability with OpenTelemetry and GitOps
-
-This sample is currently work in progress.
+# Sample with Azure IoT Operations and Local Observability with OpenTelemetry and GitOps
 
 In this sample, a Visual Studio Code dev container is used as the developer sandbox to leverage a local K3D cluster, initialize Azure resources and install a baseline set of Azure IoT Operations' components.
 
@@ -8,8 +6,8 @@ The objective is to illustrate how to setup observability to be able to locally 
 
 If you’re looking for a default observability setup and wish to analyze observability data using Azure Arc extensions and Azure Monitor in the cloud, follow [this documentation](https://learn.microsoft.com/en-us/azure/iot-operations/monitor/howto-configure-observability).
 
-> [!WARNING]
-> Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability. The current version is pinned in this dev container is Azure IoT Operations Preview v0.8.32.
+> [!TIP]
+> This sample is compatible with Azure IoT Operations version 1.0.0.
 
 ## Getting Started
 
