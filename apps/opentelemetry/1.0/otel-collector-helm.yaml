@@ -114,6 +114,9 @@ spec:
             - key: deployment.environment
               value: DEV
               action: insert
+            - key: cluster
+              value: devcontainer
+              action: insert
         batch: {}
         memory_limiter:
           limit_percentage: 80
