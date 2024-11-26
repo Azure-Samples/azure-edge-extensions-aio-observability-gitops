@@ -72,7 +72,8 @@ done
 echo "MQ Broker is now running"
 
 # Deploy OPC PLC Simulator 
-kubectl apply -f "$scriptPath/yaml/opc-plc.yaml"
+echo "Deploying OPC PLC Simulator"
+kubectl apply -f https://raw.githubusercontent.com/Azure-Samples/explore-iot-operations/main/samples/quickstarts/opc-plc-deployment.yaml
 
 # OPC AssetEndpointProfile and Assets with a Bicep template
 echo "Deploying OPC AssetEndpointProfile and Asset using Bicep"
