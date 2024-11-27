@@ -7,8 +7,8 @@ configMapGenerator:
   - name: custom-grafana-dashboards
     namespace: edge-observability
     files:
-      - grafana-dashboards/opc-ua-broker.json
-      - grafana-dashboards/mq-broker.json
       - grafana-dashboards/resource-usage.json
+      # The following is a dashboard from this source location: https://github.com/Azure/azure-iot-operations/blob/main/samples/grafana-dashboard/aio.sample.json, removed some Az Monitor panels
+      - grafana-dashboards/aio-sample.json
 generatorOptions:
   disableNameSuffixHash: true

@@ -65,7 +65,7 @@ The configuration used in this sample includes the following components:
 
 The following diagram illustrates configured components and the flow of observability data:
 
-![otel-diagram](./images/otel-diagram.jpg)
+![otel-diagram](./images/otel-diagram.png)
 
 The OpenTelemetry Collector can be further customized according to your requirements. For instance, you might choose to export data to your preferred observability backend or limit the exported data by applying filters through processors. An example of this could be:
 

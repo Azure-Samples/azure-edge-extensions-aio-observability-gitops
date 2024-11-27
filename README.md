@@ -1,6 +1,4 @@
-# Sample with Azure IoT Operations Preview and Local Observability with OpenTelemetry and GitOps
-
-This sample is currently work in progress.
+# Sample with Azure IoT Operations and Local Observability with OpenTelemetry and GitOps
 
 In this sample, a Visual Studio Code dev container is used as the developer sandbox to leverage a local K3D cluster, initialize Azure resources and install a baseline set of Azure IoT Operations' components.
 
@@ -8,8 +6,8 @@ The objective is to illustrate how to setup observability to be able to locally 
 
 If you’re looking for a default observability setup and wish to analyze observability data using Azure Arc extensions and Azure Monitor in the cloud, follow [this documentation](https://learn.microsoft.com/en-us/azure/iot-operations/monitor/howto-configure-observability).
 
-> [!WARNING]
-> Azure IoT Operations is still in Preview. Any parts of sample could stop working as the product evolves towards General Availability. The current version is pinned in this dev container is Azure IoT Operations Preview v0.8.32.
+> [!IMPORTANT]
+> This sample is compatible with Azure IoT Operations version 1.0.0.
 
 ## Getting Started
 
@@ -85,9 +83,9 @@ Enable the local K3D cluster to Azure Arc and install Azure IoT Operations with 
 1. Run the script `./deploy/2-flux-install.sh` to create a [Flux](https://fluxcd.io/flux/) configuration with edge observability components and OpenTelemetry collector.
 1. Run the script `./deploy/3-azure-iot-operations.sh`.
 
-   This script installs Azure IoT Operations and adds a developer-only mode, non-TLS enabled MQ Broker listener so you can debug messages without setting up TLS from the local machine to the local cluster. This setting is for the developer inner loop and should never be done in production.
+   This script installs Azure IoT Operations, a sample Asset and a simulated OPC PLC server.
 
-1. Validate the installation finished correctly by running `mqttui` in the terminal. You should see messages being published in the topic `azure-iot-operations`.
+1. (Optional) To validate messages are flowing through from the OPC UA Server into MQ Broker, you can active a developer-only non-TLS [MQTT broker listener for LoadBalancer](https://learn.microsoft.com/azure/iot-operations/manage-mqtt-broker/howto-test-connection?tabs=portal#only-turn-off-tls-and-authentication-for-testing), on port 1883, and then use the CLI tool `mqttui` installed in this dev container.
 
 ### View observability data
 

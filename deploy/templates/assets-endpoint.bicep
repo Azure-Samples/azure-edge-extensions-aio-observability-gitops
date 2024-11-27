@@ -12,7 +12,7 @@ resource deviceRegistry_extension 'Microsoft.KubernetesConfiguration/extensions@
   name: 'assets'
 }
 
-resource opc_ua_connector_0 'microsoft.deviceregistry/assetendpointprofiles@2024-09-01-preview' = {
+resource opc_ua_connector_0 'microsoft.deviceregistry/assetendpointprofiles@2024-11-01' = {
   extendedLocation: {
     name: resourceId(
       'Microsoft.ExtendedLocation/customLocations',
@@ -35,7 +35,7 @@ resource opc_ua_connector_0 'microsoft.deviceregistry/assetendpointprofiles@2024
   ]
 }
 
-resource thermostat 'microsoft.deviceregistry/assets@2024-09-01-preview' = {
+resource thermostat 'microsoft.deviceregistry/assets@2024-11-01' = {
   extendedLocation: {
     name: resourceId(
       'Microsoft.ExtendedLocation/customLocations',
