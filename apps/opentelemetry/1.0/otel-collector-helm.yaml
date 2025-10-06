@@ -19,11 +19,13 @@ spec:
   chart:
     spec:
       chart: opentelemetry-collector
-      version: 0.108.0
+      version: 0.136.1
       interval: 6h
       sourceRef:
         kind: HelmRepository
         name: open-telemetry
+      verify:
+        provider: cosign
   values:
     mode: deployment
     fullnameOverride: otel-collector
@@ -42,7 +44,7 @@ spec:
         enabled: true
     image:
       repository: otel/opentelemetry-collector-contrib
-      tag: 0.108.0
+      tag: 0.114.0@sha256:6ab78adda9a0b877ba55fd18e07a8c9f4d39e20ae906c9a3c79c36f37d49e7f7
     config:
       receivers:
         otlp:

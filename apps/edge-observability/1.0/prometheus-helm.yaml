@@ -22,11 +22,13 @@ spec:
   chart:
     spec:
       chart: prometheus
-      version: 25.4.0
+      version: 27.39.0
       interval: 6h
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
+      verify:
+        provider: cosign
   values:
     kube-state-metrics:
       enabled: false
