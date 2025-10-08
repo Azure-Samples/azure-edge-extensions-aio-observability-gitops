@@ -24,7 +24,7 @@ jobs:
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@b82e662a7199df56ac962118e506d9efb9830f82 # v4.1.0
       with:
-        versionSpec: '5.x'
+        versionSpec: '6.x'
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@b82e662a7199df56ac962118e506d9efb9830f82 # v4.1.0
       with:
