@@ -5,6 +5,7 @@
   - [Local egde observability stack](#local-egde-observability-stack)
   - [OpenTelemetry collector configuration](#opentelemetry-collector-configuration)
   - [Grafana dashboards updates](#grafana-dashboards-updates)
+  - [Version management](#version-management)
   - [Considerations](#considerations)
   - [Troubleshooting](#troubleshooting)
 
@@ -122,6 +123,29 @@ To create a new dashboard in Grafana:
 7. Within a minute, the flux controller will fetch the changes and reconcile them in the cluster.
 
 If you wish to update an existing dashboard, simply make the necessary modifications to the corresponding dashboard JSON file and then proceed with steps 6 and 7.
+
+## Version management
+
+All OpenTelemetry and observability helm charts in this repository use specific versions with SHA pinning for security and reproducibility. The charts include:
+
+- **OpenTelemetry Collector** - for collecting metrics, logs, and traces
+- **Prometheus** - for metrics storage and querying
+- **Grafana** - for visualization and dashboards
+- **Tempo** - for distributed tracing
+- **Loki** - for log aggregation
+
+Each chart version is pinned using:
+1. Explicit version numbers
+2. Cosign signature verification (`verify.provider: cosign`)
+3. SHA256 digest pinning for container images (where applicable)
+
+This approach ensures:
+- Reproducible deployments across environments
+- Protection against supply chain attacks
+- Clear audit trail of what was deployed
+- Safe and reliable rollback capabilities
+
+For detailed information about current versions, update procedures, and troubleshooting, see the [Version Management Guide](./version-management.md).
 
 ## Considerations
 

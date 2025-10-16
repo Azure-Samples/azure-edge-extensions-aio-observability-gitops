@@ -20,11 +20,13 @@ spec:
   chart:
     spec:
       chart: grafana
-      version: 7.0.2
+      version: 10.0.0
       interval: 6h
       sourceRef:
         kind: HelmRepository
         name: grafana
+      verify:
+        provider: cosign
   values:
     datasources:
       datasources.yaml:
@@ -97,11 +99,13 @@ spec:
   chart:
     spec:
       chart: tempo
-      version: 1.7.0
+      version: 1.23.3
       interval: 6h
       sourceRef:
         kind: HelmRepository
         name: grafana
+      verify:
+        provider: cosign
   values:
     persistence:
       enabled: true
@@ -189,11 +193,13 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 5.36.3
+      version: 6.42.0
       interval: 6h
       sourceRef:
         kind: HelmRepository
         name: grafana
+      verify:
+        provider: cosign
   values:
     loki:
       commonConfig:
