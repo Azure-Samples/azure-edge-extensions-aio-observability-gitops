@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden Runner
-      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+      uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
       with:
         egress-policy: audit
 
@@ -22,11 +22,11 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@b82e662a7199df56ac962118e506d9efb9830f82 # v4.1.0
+      uses: gittools/actions/gitversion/setup@d0139503a9321f76b4a417dfdc8aebcec24decdd # v4.2.0
       with:
         versionSpec: '5.x'
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@b82e662a7199df56ac962118e506d9efb9830f82 # v4.1.0
+      uses: gittools/actions/gitversion/execute@d0139503a9321f76b4a417dfdc8aebcec24decdd # v4.2.0
       with:
         useConfigFile: true
     - name: Create git tag
